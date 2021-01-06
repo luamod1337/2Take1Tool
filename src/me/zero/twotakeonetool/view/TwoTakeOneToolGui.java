@@ -59,14 +59,14 @@ public class TwoTakeOneToolGui extends JFrame{
 			@Override
 			public void run() {
 				try {
-					String updateUrlFile = "";
+					String updateUrlFile = "https://raw.githubusercontent.com/luamod1337/2Take1Tool/master/src/ressources/files/update.yml";
 					URL url = new URL(updateUrlFile);
 					URLConnection urlConnection = url.openConnection();
 					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), updateUrlFile);							
 					String updateUrl = config.getSettings().get("updateUrl").toString();
 					String updateVersion = config.getSettings().get("version").toString();
 					
-					String path = TwoTakeOneTool.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().toString();
+					String path = TwoTakeOneTool.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().toString() + "\\2Take1Tool_Update_" + updateVersion + ".jar";
 					
 					System.out.println(path);
 					
@@ -87,11 +87,12 @@ public class TwoTakeOneToolGui extends JFrame{
 									fileOutputStream.close();
 									JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
 								} catch (IOException e) {
+									e.printStackTrace();
 									JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "'");
 								}
 							}
 						}
-					}							
+					}
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "Error checking webpage for updates");
 					e.printStackTrace();
