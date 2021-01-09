@@ -13,6 +13,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -266,6 +268,22 @@ public class FileLoader {
 		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);
 		pack.install();
 	}
+	public static void installWebPack(String name) {
+		
+		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);
+		pack.install();
+		//Copy Pack to right Folder
+		try {
+			pack.close();
+			TwoTakeOneToolGui.instance.gui.pane.removePack(name);
+			Files.move(
+					new File(pack.config.getPath()).toPath(), 
+					new File(TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName() + ".2take1pack").toPath(), 
+					StandardCopyOption.REPLACE_EXISTING);
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public static void deinstallPack(String name) {
 		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);	
 		pack.deinstall();
@@ -374,7 +392,9 @@ public class FileLoader {
 								if(TwoTakeOneToolGui.instance.gui.getToolBar().getSelectedEntryType().equals(type)) {
 									FileConfiguration webPackconfig = loadWebPack(type, webpackUrl);
 									if(webPackconfig != null) {
-										TwoTakeOneToolGui.instance.gui.pane.addTwoTakeOnePackView(new TwoTakeOnePackView(webPackconfig, TwoTakeOneToolGui.instance.gui.getSideBar(), type));
+										TwoTakeOnePackView pack = new TwoTakeOnePackView(webPackconfig, TwoTakeOneToolGui.instance.gui.getSideBar(), type);
+										pack.setWebPack(true);
+										TwoTakeOneToolGui.instance.gui.pane.addTwoTakeOnePackView(pack);
 										TwoTakeOneToolGui.instance.gui.repaint();	
 									}																
 								}else {
@@ -448,4 +468,6 @@ public class FileLoader {
 	    }
 	    return directoryToBeDeleted.delete();
 	}
+
+	
 }

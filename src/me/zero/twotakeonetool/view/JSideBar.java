@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
+import me.zero.twotakeonetool.FileLoader;
+import me.zero.twotakeonetool.type.SideBarEntryType;
+
 public class JSideBar extends JComponent{
 
 	private static final long serialVersionUID = 1L;
@@ -148,6 +151,9 @@ public class JSideBar extends JComponent{
 
 	public void setSelectedEntry(JSideBarEntry entry) {
 		parent.gui.getToolBar().clear();
+		if(!entry.getType().equals(SideBarEntryType.WEB)) {
+			FileLoader.clearTempPack();
+		}
 		if(entry.getText().length() > 0 && !entry.equals(selectedEntry)) {
 			selectedEntry = entry;
 			parent.gui.pane.loadSelectedEntry(selectedEntry);

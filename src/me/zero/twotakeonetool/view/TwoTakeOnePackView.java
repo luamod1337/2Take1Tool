@@ -46,6 +46,7 @@ public class TwoTakeOnePackView extends JComponent{
 	private String name;
 	private String version;
 	
+	public boolean isWebPack = false;
 	private SideBarEntryType type;
 	
 	public InstallStatus status = InstallStatus.READY_TO_INSTALL;
@@ -63,8 +64,13 @@ public class TwoTakeOnePackView extends JComponent{
 		try {
 			install = new JSideBarEntry("install",ImageIO.read(getClass().getResource("/ressources/images/install.png")), bar, new Consumer<JSideBarEntry>() {				
 				@Override
-				public void accept(JSideBarEntry t) {					
-					FileLoader.installPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+				public void accept(JSideBarEntry t) {			
+					if(isWebPack) {
+						FileLoader.installWebPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+					}else {
+						FileLoader.installPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+					}
+					
 					HashMap<String, Object> data = FileLoader.loadDataStorage().getSettings();
 					@SuppressWarnings("unchecked")
 					ArrayList<String> dataList = (ArrayList<String>) data.get("installedPack");
@@ -288,7 +294,6 @@ public class TwoTakeOnePackView extends JComponent{
 	}
 
 	public void install() {
-		System.out.println("install " + this.name + " to folder " + TwoTakeOneTool.getInstallFolderBySelectedEntry(this).getAbsolutePath());
 		try {
 			config.install(TwoTakeOneTool.getInstallFolderBySelectedEntry(this));
 			status = InstallStatus.INSTALLED;			
@@ -306,12 +311,16 @@ public class TwoTakeOnePackView extends JComponent{
 					ArrayList<String> dataList = (ArrayList<String>) data.get("installedPack");
 					if(dataList == null) dataList = new ArrayList<>();
 					dataList.add(t.getPack().getName() + ":" + t.getPack().getVersion());
-;					FileLoader.loadDataStorage().storeData("installedPack", dataList);
+					FileLoader.loadDataStorage().storeData("installedPack", dataList);
 				}
 			});
 			this.repaint();
-			JOptionPane.showMessageDialog(null, "Installed " + this.getName() + " Version: " + this.getVersion());
-			} catch (IOException e) {
+			if(isWebPack) {
+				JOptionPane.showMessageDialog(null, "Installed " + this.getName() + " Version: " + this.getVersion() + ", you can find this pack inside its category!");
+			}else {
+				JOptionPane.showMessageDialog(null, "Installed " + this.getName() + " Version: " + this.getVersion());
+			}
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -323,11 +332,15 @@ public class TwoTakeOnePackView extends JComponent{
 			install.setWidth(90);
 			install.setType(SideBarEntryType.INSTALL);
 			install.setX(TwoTakeOneToolGui.instance.getWidth()-300);
-			install.setImage(ImageIO.read(getClass().getResource("/ressources/images/install2.png")));
+			install.setImage(ImageIO.read(getClass().getResource("/ressources/images/install.png")));
 			install.setFunction(new Consumer<JSideBarEntry>() {	
 				@Override
 				public void accept(JSideBarEntry t) {
-					FileLoader.installPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+					if(isWebPack) {
+						FileLoader.installWebPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+					}else {
+						FileLoader.installPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+					}
 					HashMap<String, Object> data = FileLoader.loadDataStorage().getSettings();
 					@SuppressWarnings("unchecked")
 					ArrayList<String> dataList = (ArrayList<String>) data.get("installedPack");
@@ -349,5 +362,8 @@ public class TwoTakeOnePackView extends JComponent{
 
 	public void setType(SideBarEntryType type) {
 		this.type = type;
+	}
+	public void setWebPack(boolean isWebPack) {
+		this.isWebPack = isWebPack;
 	}
 }
