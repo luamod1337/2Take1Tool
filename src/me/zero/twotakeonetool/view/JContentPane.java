@@ -9,14 +9,26 @@ import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+
+import org.yaml.snakeyaml.Yaml;
 
 import me.zero.twotakeonetool.FileLoader;
+import me.zero.twotakeonetool.TwoTakeOneTool;
 import me.zero.twotakeonetool.config.FileConfiguration;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 
@@ -44,7 +56,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		if(bar == null || tbar == null) {
-			System.out.println("paint: out");
 			return;
 		}
 		Graphics2D g2 = (Graphics2D)g;
@@ -53,12 +64,15 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 		
 		//
 		int cnt = 0;
-		for(String key : packKeys) {
-			TwoTakeOnePackView pack = packs.get(key);
-			pack.paint(g2,bar.getWidth()+2,tbar.getHeight()+2 + (cnt++*402)+offsetY);
-			pack.paint(g2);
-		}
-		
+		try {
+			for(String key : packKeys) {
+				TwoTakeOnePackView pack = packs.get(key);
+				pack.paint(g2,bar.getWidth()+2,tbar.getHeight()+2 + (cnt++*402)+offsetY);
+				pack.paint(g2);
+			}
+		}catch(ConcurrentModificationException e) {
+			//Ignore it here, it will be drawn later again
+		}		
 		if(bar.getSelectedEntry() == null && packs.size() == 0) {
 			g2.setColor(new Color(46,48,62));
 			//System.out.println("paint-selected: " + bar.getSelectedEntry().getName());
@@ -112,14 +126,60 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			}
 		}
 		
+		if(tbar.getEntrys().size() == 0) {
+			try {
+				JSideBarEntry load = new JSideBarEntry("",ImageIO.read(getClass().getResource("/ressources/images/file.png")), bar, new Consumer<JSideBarEntry>() {				
+					@Override
+					public void accept(JSideBarEntry t) {
+						if(bar.getSelectedEntry() != null){
+							JFileChooser chooser = new JFileChooser();
+							chooser.setDialogTitle("Select a pack of type '" + bar.getSelectedEntry().getType() + "'");
+							chooser.setAcceptAllFileFilterUsed(false);
+							chooser.setFileFilter(new FileFilter() {							
+								@Override
+								public String getDescription() {
+									return "2take1pack";
+								}							
+								@Override
+								public boolean accept(File f) {							
+									if(f.getAbsolutePath().endsWith(".2take1pack") || f.isDirectory()) {
+										return true;
+									}
+									return false;
+								}
+							});
+							int returnVal = chooser.showOpenDialog(null);
+							if(returnVal == JFileChooser.APPROVE_OPTION) {							
+									File f = new File(TwoTakeOneTool.getInstallFolderBySelectedEntry(bar.getSelectedEntry().getType()) + "\\" + chooser.getSelectedFile().getName());								
+									try {
+										Files.move(chooser.getSelectedFile().toPath(), f.toPath());
+									} catch (IOException e) {
+										e.printStackTrace();
+									}								
+									FileConfiguration config = FileLoader.loadModFile(f, bar.getSelectedEntry().getType());
+									addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,bar.getSelectedEntry().getType()));							
+							}
+						}else if(bar.getSelectedEntry() != null) {
+							System.out.println("unknown type " + bar.getSelectedEntry().getType().name());
+							JOptionPane.showMessageDialog(null, "Not supported yet");
+						}
+					}
+				}, SideBarEntryType.LOAD);
+				load.setWidth(25);
+				tbar.addEntry(load);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}else {
+			System.out.println("tbar entries: " + tbar.getEntrys().size());
+		}
 		
 		this.packs.clear();
 		this.packKeys.clear();
-		this.offsetY = 0;
+		this.offsetY = 0;		
 		if(selectedEntry.getType().equals(SideBarEntryType.SCRIPT)) {
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 			ArrayList<FileConfiguration> packs = FileLoader.loadModDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -129,7 +189,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadSpriteDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -139,7 +198,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadProtectionDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -149,7 +207,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadTeleportDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -159,7 +216,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadAnimationDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -169,7 +225,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadObjectDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -179,7 +234,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadStatDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -189,7 +243,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadObjectDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -199,7 +252,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadFontDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -209,7 +261,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadConfigDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -219,7 +270,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadLanguageDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -229,7 +279,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadOutfitDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
@@ -239,10 +288,46 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadVehicleDirectory();
-			//tbar.setExtraHeaderText(" (" + packs.size() + ")");
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}
+			TwoTakeOneToolGui.instance.repaint();
+			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}else if(selectedEntry.getType().equals(SideBarEntryType.WEB)) {
+			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));					
+			try {
+				String updateUrlFile = "https://raw.githubusercontent.com/luamod1337/2take1packs/master/packList.yml";
+				URL url = new URL(updateUrlFile);
+				URLConnection urlConnection = url.openConnection();
+				FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), updateUrlFile);	
+				this.tbar.clear();
+				
+				for(String key : config.getSettings().keySet()) {	
+					JSideBarEntry ent = new JSideBarEntry("",ImageIO.read(getClass().getResource(TwoTakeOneTool.getIconUrlBySidebarEntry(SideBarEntryType.valueOf(key.toUpperCase())))), bar, new Consumer<JSideBarEntry>() {				
+						@Override
+						public void accept(JSideBarEntry t) {
+							Object o = config.getSettings().get(key);
+							if(o.getClass().equals(ArrayList.class)) {
+								@SuppressWarnings("unchecked")
+								ArrayList<String> list = (ArrayList<String>)o;
+								tbar.setSelectedEntryType(t.getType());
+								for(String s : list) {
+									FileLoader.clearTempPack();
+									FileLoader.loadWebPacks(t.getType(),s);									
+								}
+							}else {
+								System.out.println("unknown type '" + o.getClass() + "'");
+								JOptionPane.showMessageDialog(null, "","Error",JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}, SideBarEntryType.valueOf(key.toUpperCase()));
+					ent.setWidth(25);
+					this.tbar.addEntry(ent);
+				}
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "Error checking webpage for updates");
+				e.printStackTrace();
+			}			
 			TwoTakeOneToolGui.instance.repaint();
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}else{
@@ -271,14 +356,32 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 		if(offsetY/400 > loaded) {
 			loaded++;
 		}
-		if(bar.getSelectedEntry() != null && (TwoTakeOneToolGui.instance.getHeight()-tbar.getHeight() + (offsetY*-1)) > (this.packs.size()*400)) {
+		if(bar.getSelectedEntry() != null && (TwoTakeOneToolGui.instance.getHeight()-tbar.getHeight() + (offsetY*-1)) > (this.packs.size()*400)) {					
 			FileConfiguration config = FileLoader.loadNextPack(bar.getSelectedEntry().getType(), bar);			
-			if(config != null) {		
-				TwoTakeOnePackView pack = new TwoTakeOnePackView(config, bar,bar.getSelectedEntry().getType());
+			if(config != null) {	
+				TwoTakeOnePackView pack;
+				if(bar.getSelectedEntry().getType().equals(SideBarEntryType.WEB)) {
+					pack = new TwoTakeOnePackView(config, bar,TwoTakeOneToolGui.instance.gui.pane.getTbar().getSelectedEntryType());
+				}else {
+					pack = new TwoTakeOnePackView(config, bar,bar.getSelectedEntry().getType());
+				}
 				this.packKeys.add((pack.config.getString("Name")+":" + pack.config.getString("Version")));
 				this.packs.put(pack.getName()+":" + pack.getVersion(), pack);
 			}
 		}
 		TwoTakeOneToolGui.instance.gui.repaint();
+	}
+
+	public JToolToolBar getTbar() {
+		return tbar;
+	}
+	public void addPack(TwoTakeOnePackView pack) {
+		this.packKeys.add((pack.config.getString("Name")+":" + pack.config.getString("Version")));
+		this.packs.put(pack.getName()+":" + pack.getVersion(), pack);
+	}
+	public void clear() {
+		this.packs.clear();
+		this.packKeys.clear();
+		this.offsetY = 0;
 	}
 }

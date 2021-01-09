@@ -27,6 +27,7 @@ public class TwoTakeOneTool {
 	public static File fontFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\font");
 	public static File languageFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\language");
 	public static File configFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\config");
+	public static File tempFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\temp");
 	
 	public static File settingsFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\settings");
 	
@@ -38,6 +39,7 @@ public class TwoTakeOneTool {
 	public static File vehicleFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\moddedVehicles\\");
 	public static File languageFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\");
 	public static File fontFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\");
+
 	
 	
 	public static void main(String[] args) {
@@ -71,6 +73,7 @@ public class TwoTakeOneTool {
 			fontFolder.mkdir();
 			languageFolder.mkdir();
 			configFolder.mkdir();
+			tempFolder.mkdir();
 
 			settingsFolder.mkdir();
 			try {
@@ -128,5 +131,36 @@ public class TwoTakeOneTool {
 	}
 	public static File getPackFolderBySelectedEntry(TwoTakeOnePackView twoTakeOnePackView) {
 		return getPackFolderBySelectedEntry(twoTakeOnePackView.getType());
+	}
+	
+	public static String getIconUrlBySidebarEntry(SideBarEntryType type) {
+		if(type.equals(SideBarEntryType.SPRITE)) {
+			return "/ressources/images/image.png";
+		}else if(type.equals(SideBarEntryType.SCRIPT)) {
+			return "/ressources/images/lua.png";
+		}else if(type.equals(SideBarEntryType.VEHICLE)) {
+			return "/ressources/images/car.png";
+		}else if(type.equals(SideBarEntryType.CONFIG)) {
+			return "/ressources/images/config.png";
+		}else if(type.equals(SideBarEntryType.LANGUAGE)) {
+			return "/ressources/images/language.png";
+		}else if(type.equals(SideBarEntryType.FONT)) {
+			return "/ressources/images/font.png";
+		}else if(type.equals(SideBarEntryType.OUTFIT)) {
+			return "/ressources/images/outfit.png";
+		}else if(type.equals(SideBarEntryType.PROTECTION)) {
+			return "/ressources/images/protection.png";
+		}else if(type.equals(SideBarEntryType.ANIMATION)) {
+			return "/ressources/images/animation.png";
+		}else if(type.equals(SideBarEntryType.STAT)) {
+			return "/ressources/images/stats.png";
+		}else if(type.equals(SideBarEntryType.TELEPORT) ) {
+			return "/ressources/images/map.png";
+		}else if(type.equals(SideBarEntryType.OBJECT)) {
+			return "/ressources/images/object.png";
+		}else {
+			JOptionPane.showMessageDialog(null, "Unknown install folder for type " + type.name());
+		}
+		return null;
 	}
 }

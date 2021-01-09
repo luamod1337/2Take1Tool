@@ -64,19 +64,16 @@ public class TwoTakeOneToolGui extends JFrame{
 					URLConnection urlConnection = url.openConnection();
 					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), updateUrlFile);							
 					String updateUrl = config.getSettings().get("updateUrl").toString();
-					String updateVersion = config.getSettings().get("version").toString();
-					
-					String path = TwoTakeOneTool.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().toString() + "\\2Take1Tool_Update_" + updateVersion + ".jar";
-					
-					System.out.println(path);
+					String updateVersion = config.getSettings().get("version").toString();					
+					//String path = TwoTakeOneTool.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().toString() + "\\2Take1Tool_Update_" + updateVersion + ".jar";
+					String path = TwoTakeOneTool.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().toString();
 					
 					if(updateUrl != null && updateVersion != null) {
 						if(!updateVersion.toString().equalsIgnoreCase(version)) {
 							int option = JOptionPane.showConfirmDialog(null, "Update '" + updateVersion + "' found, download ?","Update found",JOptionPane.OK_CANCEL_OPTION);
 							if(option == JOptionPane.OK_OPTION) {
 								try {
-									BufferedInputStream in = new BufferedInputStream(new URL(updateUrl).openStream());									
-									
+									BufferedInputStream in = new BufferedInputStream(new URL(updateUrl).openStream());
 									FileOutputStream fileOutputStream = new FileOutputStream(path);
 									byte dataBuffer[] = new byte[1024];
 									int bytesRead;
@@ -86,9 +83,16 @@ public class TwoTakeOneToolGui extends JFrame{
 									fileOutputStream.flush();
 									fileOutputStream.close();
 									JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
+									
+									int restart = JOptionPane.showConfirmDialog(null, "2Take1Tool needs to be restarted, in order to complete the update, restart now ?","Reboot 2Take1Tool ?",JOptionPane.OK_CANCEL_OPTION);
+																		
+									if(restart == JOptionPane.OK_OPTION) {
+										System.exit(0);
+									}
+									
 								} catch (IOException e) {
 									e.printStackTrace();
-									JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "'");
+									JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "' " + e.getMessage());
 								}
 							}
 						}

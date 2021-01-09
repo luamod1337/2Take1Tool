@@ -11,6 +11,13 @@ public class SidebarMouseListener implements MouseListener,MouseWheelListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		TwoTakeOneToolGui.instance.mouseClicked(e);
+		if(e.getPoint().x < TwoTakeOneToolGui.instance.gui.getSideBar().getWidth()) {
+			if(e.getPoint().y < TwoTakeOneToolGui.instance.gui.getSideBar().getEntryYStart() || e.getPoint().y > TwoTakeOneToolGui.instance.gui.getSideBar().getEntryYEnd()) {
+				TwoTakeOneToolGui.instance.gui.getSideBar().setOpened(!TwoTakeOneToolGui.instance.gui.getSideBar().isOpen());
+				TwoTakeOneToolGui.instance.gui.getSideBar().repaint();
+				return;
+			}
+		}
 	}
 
 	@Override

@@ -131,6 +131,7 @@ public class TwoTakeOnePackView extends JComponent{
 											fileOutputStream.close();
 											JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
 										} catch (IOException e) {
+											System.out.println("Error downloading '" + updateUrl + "'");
 											JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "'");
 										}
 									}

@@ -18,21 +18,22 @@ public class SideBarEntryMouseListener implements MouseListener{
 	}
 	
 	@Override
-	public void mouseClicked(MouseEvent e) {		
+	public void mouseClicked(MouseEvent e) {	
+		
 		if(e.getPoint().x < (this.entry.getX() + this.entry.getWidth()) && e.getPoint().x > this.entry.getX()) {
 			if(e.getPoint().y < (this.entry.getY() + this.entry.getHeight()) && e.getPoint().y > this.entry.getY()) {
 				this.entry.onClick();
 				bar.getParent().repaint();
 			}
 		}
+		/*System.out.println("-----");
+		System.out.println("click at " + e.getPoint());
+		System.out.println("sidebar x = 0," + TwoTakeOneToolGui.instance.gui.getSideBar().getWidth());
+		System.out.println("sidebar y = " + TwoTakeOneToolGui.instance.gui.getSideBar().getEntryYStart() + "," + TwoTakeOneToolGui.instance.gui.getSideBar().getEntryYEnd());
+		System.out.println("/-----");
+		System.out.println();*/
 		//Just for Sidebar Check
-		if(e.getPoint().x < TwoTakeOneToolGui.instance.gui.getSideBar().getWidth()) {
-			if(e.getPoint().y < TwoTakeOneToolGui.instance.gui.getSideBar().getEntryYStart() || e.getPoint().y > TwoTakeOneToolGui.instance.gui.getSideBar().getEntryYEnd()) {
-				TwoTakeOneToolGui.instance.gui.getSideBar().setOpened(!TwoTakeOneToolGui.instance.gui.getSideBar().isOpen());
-				TwoTakeOneToolGui.instance.gui.getSideBar().repaint();
-				return;
-			}
-		}
+		
 	}
 
 	@Override

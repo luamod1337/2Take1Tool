@@ -147,6 +147,7 @@ public class JSideBar extends JComponent{
 	}
 
 	public void setSelectedEntry(JSideBarEntry entry) {
+		parent.gui.getToolBar().clear();
 		if(entry.getText().length() > 0 && !entry.equals(selectedEntry)) {
 			selectedEntry = entry;
 			parent.gui.pane.loadSelectedEntry(selectedEntry);

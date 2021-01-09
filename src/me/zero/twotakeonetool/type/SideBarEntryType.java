@@ -23,9 +23,7 @@ public enum SideBarEntryType {
 	DELETE,
 	DEINSTALL,
 	FORWARD,
-	BACKWARD
-	
-	
-	;
-	
+	BACKWARD, 
+	WEB
+	;	
 }

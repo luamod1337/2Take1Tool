@@ -29,6 +29,7 @@ public class JToolToolBar extends JComponent{
 	private JSideBar bar;
 	private ArrayList<JSideBarEntry> entrys = new ArrayList<>();
 	private String extraHeaderText = "";
+	private SideBarEntryType selectedEntryType;
 	
 	public JToolToolBar(JSideBar bar,JContentPane pane) {
 		this.bar = bar;
@@ -75,7 +76,7 @@ public class JToolToolBar extends JComponent{
 			entrys.add(load);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 	
 	@Override
@@ -91,14 +92,33 @@ public class JToolToolBar extends JComponent{
 		if(bar.getSelectedEntry() != null) {
 			g2.drawString(bar.getSelectedEntry().getText() + extraHeaderText, bar.getWidth()+2, 40);
 		}
-		if(bar.getSelectedEntry() != null) {
+		if(bar.getSelectedEntry() != null ) {
 			for(int i = 0; i < entrys.size();i++) {
 				JSideBarEntry e = entrys.get(i);
-				g2.setColor(new Color(41,44,56));
-				g2.drawRect((bar.getWidth()) + (i*20)-2,80-25, e.getWidth()+4, e.getHeight() + 10);
-				g2.setColor(new Color(126,86,194));
-				e.paint(g2,(bar.getWidth()) + (i*20),80);
-			}
+				if(bar.getSelectedEntry().getType().equals(SideBarEntryType.WEB)) {
+					if(!e.getType().equals(SideBarEntryType.LOAD)) {					
+						g2.setColor(new Color(41,44,56));
+						g2.drawRect((bar.getWidth()) + (i*40)-2,80-25, e.getWidth()+4, e.getHeight() + 10);
+						g2.setColor(new Color(126,86,194));
+						if(e.getText().length() == 0) {
+							e.paint(g2,(bar.getWidth()) + ((i)*40),80);
+						}else {
+							e.paint(g2,(bar.getWidth()) + ((i)*100),80);
+						}
+					}
+				}else {
+					if(e.getType().equals(SideBarEntryType.LOAD)) {					
+						g2.setColor(new Color(41,44,56));
+						g2.drawRect((bar.getWidth()) + (i*40)-2,80-25, e.getWidth()+4, e.getHeight() + 10);
+						g2.setColor(new Color(126,86,194));
+						if(e.getText().length() == 0) {
+							e.paint(g2,(bar.getWidth()) + (i*40),80);
+						}else {
+							e.paint(g2,(bar.getWidth()) + (i*100),80);
+						}
+					}
+				}					
+			}			
 		}
 	}
 
@@ -137,4 +157,24 @@ public class JToolToolBar extends JComponent{
 		this.extraHeaderText = extraHeaderText;
 	}
 	
+	public void addEntry(JSideBarEntry entry) {
+		this.entrys.add(entry);
+	}
+	public void clear() {
+		for(JSideBarEntry e : entrys) {
+			e.close();
+		}
+		this.entrys.clear();
+	}
+
+	public ArrayList<JSideBarEntry> getEntrys() {
+		return entrys;
+	}
+
+	public void setSelectedEntryType(SideBarEntryType type) {
+		this.selectedEntryType = type;
+	}
+	public SideBarEntryType getSelectedEntryType() {
+		return selectedEntryType;
+	}
 }

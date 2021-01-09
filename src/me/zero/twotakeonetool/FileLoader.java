@@ -1,10 +1,17 @@
 package me.zero.twotakeonetool;
 
+import java.awt.Cursor;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -13,10 +20,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import org.yaml.snakeyaml.Yaml;
 
+import javafx.geometry.Side;
 import me.zero.twotakeonetool.config.FileConfiguration;
-import me.zero.twotakeonetool.controller.SidebarMouseListener;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 import me.zero.twotakeonetool.view.JSideBar;
 import me.zero.twotakeonetool.view.TwoTakeOnePackView;
@@ -27,6 +37,10 @@ public class FileLoader {
 	private static FileConfiguration settings;
 	private static HashMap<SideBarEntryType, String> lastLoadedFile = new HashMap<>();
 	private static int startAmount = 3;
+	
+	private static ArrayList<String> webpacks = new ArrayList<>();
+	
+	private static Thread loadWebPack;
 	
 	public static FileConfiguration loadModFile(File file,SideBarEntryType type) {		
 		ZipFile zipFile;
@@ -268,10 +282,13 @@ public class FileLoader {
 		return settings;		
 	}
 
-	public static FileConfiguration loadNextPack(SideBarEntryType type,JSideBar bar) {		
+	public static FileConfiguration loadNextPack(SideBarEntryType type,JSideBar bar) {	
+		if(type.equals(SideBarEntryType.WEB)) {
+			return loadNextWebPack(type, bar);
+		}
 		ZipFile zipFile;
 		String[] sFiles = TwoTakeOneTool.getPackFolderBySelectedEntry(bar.getSelectedEntry().getType()).list();				
-		boolean nextFile = false;			
+		boolean nextFile = false;
 		for(String sFile : sFiles) {
 			try {
 				if(sFile.endsWith(".2take1pack") && FileLoader.lastLoadedFile.get(type) != null && FileLoader.lastLoadedFile.get(type).equalsIgnoreCase(sFile)) {
@@ -301,5 +318,134 @@ public class FileLoader {
 			}	
 		}			
 		return null;
+	}
+
+	private static FileConfiguration loadNextWebPack(SideBarEntryType type,JSideBar bar) {
+		boolean next = false;
+		for(String url : webpacks) {
+			if(next) {
+				FileConfiguration config;
+				if(type.equals(SideBarEntryType.WEB)) {
+					type = TwoTakeOneToolGui.instance.gui.pane.getTbar().getSelectedEntryType();
+					config = loadWebPack(type, url);
+				}else {
+					config = loadWebPack(type, url);
+				}
+				TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				return config;
+			}
+			if (url.contains(lastLoadedFile.get(type))) {
+				next = true;
+			}
+		}		
+		return null;
+	}
+	
+	public static void loadWebPacks(SideBarEntryType type, String webPackFile) {
+		
+		if(loadWebPack != null) {
+			loadWebPack.interrupt();
+			loadWebPack.stop();
+			SwingUtilities.invokeLater(new Runnable() {				
+				@Override
+				public void run() {
+					TwoTakeOneToolGui.instance.gui.pane.clear();
+					clearTempPack();
+				}
+			});
+			
+		}
+		
+		loadWebPack = new Thread(new Runnable() {			
+			@SuppressWarnings("unchecked")
+			@Override
+			public void run() {
+				try {
+					URL url = new URL(webPackFile);
+					URLConnection urlConnection = url.openConnection();
+					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), webPackFile);			
+					Object o = config.getSettings().get("packs");
+					if(o.getClass().equals(ArrayList.class)) {				
+						ArrayList<String> wpacks = (ArrayList<String>)o;
+						for(String webpackUrl  : wpacks) {
+							if(loadWebPack.isInterrupted()) {								
+								return;
+							}else {							
+								if(TwoTakeOneToolGui.instance.gui.getToolBar().getSelectedEntryType().equals(type)) {
+									FileConfiguration webPackconfig = loadWebPack(type, webpackUrl);
+									if(webPackconfig != null) {
+										TwoTakeOneToolGui.instance.gui.pane.addTwoTakeOnePackView(new TwoTakeOnePackView(webPackconfig, TwoTakeOneToolGui.instance.gui.getSideBar(), type));
+										TwoTakeOneToolGui.instance.gui.repaint();	
+									}																
+								}else {
+									loadWebPack.interrupt();
+								}
+							}							
+						}
+						TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					}else {
+						System.out.println("unknown type " + o.getClass());
+					}			
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}catch (IOException e) {
+					JOptionPane.showMessageDialog(null, "An Error occured while connecting to '" + webPackFile + "'","Error",JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});		
+		loadWebPack.start();
+	}
+	private static FileConfiguration loadWebPack(SideBarEntryType type, String webpackUrl) {		
+		if(webpackUrl.contains("packList.yml")) {
+			return null;
+		}
+		TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		String[] splittedString = webpackUrl.split("/");
+		String name = splittedString[splittedString.length-1].split(".2take1pack")[0] + ".2take1pack";
+		
+		try {
+			BufferedInputStream in = new BufferedInputStream(new URL(webpackUrl).openStream());
+			String path = TwoTakeOneTool.tempFolder + "\\" + name;
+			FileOutputStream fileOutputStream = new FileOutputStream(path);
+			byte dataBuffer[] = new byte[1024];
+			int bytesRead;
+			while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+				fileOutputStream.write(dataBuffer, 0, bytesRead);
+			}
+			fileOutputStream.flush();
+			fileOutputStream.close();
+			
+			FileLoader.lastLoadedFile.put(type, path);
+			File file = new File(path);						
+			ZipFile zipFile = new ZipFile(file);
+			lastLoadedFile.put(SideBarEntryType.WEB, file.getName());
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while(entries.hasMoreElements()){
+				ZipEntry entry = entries.nextElement();
+			    if(entry.getName().equalsIgnoreCase("install.yml")) {
+			    	InputStream stream = zipFile.getInputStream(entry);
+			        FileConfiguration config = new FileConfiguration(new Yaml(),stream,zipFile, file.getAbsolutePath());
+				    stream.close();
+				    return config;
+			    }
+			}		
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Error downloading '" + webpackUrl + "'");
+			System.out.println("Error downloading webpack '" + webpackUrl + "'");
+		}
+		return null;	
+	}
+	public static void clearTempPack() {
+		deleteDirectory(TwoTakeOneTool.tempFolder);
+		TwoTakeOneTool.tempFolder.mkdir();
+	}
+	private static boolean deleteDirectory(File directoryToBeDeleted) {
+	    File[] allContents = directoryToBeDeleted.listFiles();
+	    if (allContents != null) {
+	        for (File file : allContents) {
+	            deleteDirectory(file);
+	        }
+	    }
+	    return directoryToBeDeleted.delete();
 	}
 }

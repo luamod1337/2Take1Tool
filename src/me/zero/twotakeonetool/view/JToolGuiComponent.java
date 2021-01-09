@@ -117,12 +117,20 @@ public class JToolGuiComponent extends JComponent{
 			}
 		}, SideBarEntryType.LANGUAGE));
 		bar.addEntry(new JSideBarEntry("Config",ImageIO.read(getClass().getResource("/ressources/images/config.png")), bar, new Consumer<JSideBarEntry>() {
+					
+					@Override
+					public void accept(JSideBarEntry t) {
+						bar.setSelectedEntry(t);
+					}
+				}, SideBarEntryType.CONFIG));
+		
+		bar.addEntry(new JSideBarEntry("Webpacks",ImageIO.read(getClass().getResource("/ressources/images/web.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
-		}, SideBarEntryType.CONFIG));
+		}, SideBarEntryType.WEB));
 		
 	}
 	
