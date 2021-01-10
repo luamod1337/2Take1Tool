@@ -14,6 +14,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -24,6 +25,7 @@ import javax.swing.SwingUtilities;
 
 import org.yaml.snakeyaml.Yaml;
 
+import me.zero.twotakeonetool.FileLoader;
 import me.zero.twotakeonetool.TwoTakeOneTool;
 import me.zero.twotakeonetool.config.FileConfiguration;
 
@@ -32,11 +34,11 @@ public class TwoTakeOneToolGui extends JFrame{
 	private static final long serialVersionUID = 1L;
 	public static TwoTakeOneToolGui instance;
 	public JToolGuiComponent gui;
-	private String version = "0.1";
-	
+	private String version = "0.2";
+
 	private List<MouseListener> listener = Collections.synchronizedList(new ArrayList<MouseListener>());
 	private List<MouseWheelListener> listenerWheel = Collections.synchronizedList(new ArrayList<MouseWheelListener>());
-	
+
 	public TwoTakeOneToolGui() {
 		TwoTakeOneToolGui.instance = this;
 		this.setTitle("2Take1Tool by 1337Zero");
@@ -45,15 +47,16 @@ public class TwoTakeOneToolGui extends JFrame{
 		this.setMinimumSize(new Dimension(700,700));
 		gui = new JToolGuiComponent(this);
 		checkForUpdate();
-		this.add(gui);		
+		this.add(gui);
+
 		try {
 			ImageIcon icon = new ImageIcon(ImageIO.read(getClass().getResource("/ressources/images/logo.png")));
 			this.setIconImage(icon.getImage());
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
-	
+
 	public void checkForUpdate() {
 		Thread t = new Thread(new Runnable() {
 			@Override
@@ -62,12 +65,12 @@ public class TwoTakeOneToolGui extends JFrame{
 					String updateUrlFile = "https://raw.githubusercontent.com/luamod1337/2Take1Tool/master/src/ressources/files/update.yml";
 					URL url = new URL(updateUrlFile);
 					URLConnection urlConnection = url.openConnection();
-					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), updateUrlFile);							
+					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), updateUrlFile);
 					String updateUrl = config.getSettings().get("updateUrl").toString();
-					String updateVersion = config.getSettings().get("version").toString();					
+					String updateVersion = config.getSettings().get("version").toString();
 					//String path = TwoTakeOneTool.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().toString() + "\\2Take1Tool_Update_" + updateVersion + ".jar";
 					String path = TwoTakeOneTool.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().toString();
-					
+
 					if(updateUrl != null && updateVersion != null) {
 						if(!updateVersion.toString().equalsIgnoreCase(version)) {
 							int option = JOptionPane.showConfirmDialog(null, "Update '" + updateVersion + "' found, download ?","Update found",JOptionPane.OK_CANCEL_OPTION);
@@ -83,13 +86,13 @@ public class TwoTakeOneToolGui extends JFrame{
 									fileOutputStream.flush();
 									fileOutputStream.close();
 									JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
-									
+
 									int restart = JOptionPane.showConfirmDialog(null, "2Take1Tool needs to be restarted, in order to complete the update, restart now ?","Reboot 2Take1Tool ?",JOptionPane.OK_CANCEL_OPTION);
-																		
+
 									if(restart == JOptionPane.OK_OPTION) {
 										System.exit(0);
 									}
-									
+
 								} catch (IOException e) {
 									e.printStackTrace();
 									JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "' " + e.getMessage());
@@ -107,7 +110,7 @@ public class TwoTakeOneToolGui extends JFrame{
 		});
 		t.start();
 	}
-	
+
 	@Override
 	public void addMouseListener(MouseListener list) {
 		this.listener.add(list);
@@ -117,7 +120,7 @@ public class TwoTakeOneToolGui extends JFrame{
 		this.listener.remove(list);
 	}
 	public void mouseClicked(MouseEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {			
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				for(int i = 0; i < listener.size(); i++){
@@ -125,10 +128,10 @@ public class TwoTakeOneToolGui extends JFrame{
 					list.mouseClicked(e);
 				}
 			}
-		});		
+		});
 	}
 	public void mouseEntered(MouseEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {			
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				for(int i = 0; i < listener.size(); i++){
@@ -139,7 +142,7 @@ public class TwoTakeOneToolGui extends JFrame{
 		});
 	}
 	public void mouseExited(MouseEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {			
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				for(int i = 0; i < listener.size(); i++){
@@ -150,7 +153,7 @@ public class TwoTakeOneToolGui extends JFrame{
 		});
 	}
 	public void mousePressed(MouseEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {			
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				for(int i = 0; i < listener.size(); i++){
@@ -161,7 +164,7 @@ public class TwoTakeOneToolGui extends JFrame{
 		});
 	}
 	public void mouseReleased(MouseEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {			
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				for(int i = 0; i < listener.size(); i++){
@@ -172,7 +175,7 @@ public class TwoTakeOneToolGui extends JFrame{
 		});
 	}
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {			
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				for(int i = 0; i < listenerWheel.size(); i++){

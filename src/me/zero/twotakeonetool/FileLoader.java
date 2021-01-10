@@ -8,12 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -27,8 +25,8 @@ import javax.swing.SwingUtilities;
 
 import org.yaml.snakeyaml.Yaml;
 
-import javafx.geometry.Side;
 import me.zero.twotakeonetool.config.FileConfiguration;
+import me.zero.twotakeonetool.controller.SidebarMouseListener;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 import me.zero.twotakeonetool.view.JSideBar;
 import me.zero.twotakeonetool.view.TwoTakeOnePackView;
@@ -39,12 +37,12 @@ public class FileLoader {
 	private static FileConfiguration settings;
 	private static HashMap<SideBarEntryType, String> lastLoadedFile = new HashMap<>();
 	private static int startAmount = 3;
-	
+
 	private static ArrayList<String> webpacks = new ArrayList<>();
-	
+
 	private static Thread loadWebPack;
-	
-	public static FileConfiguration loadModFile(File file,SideBarEntryType type) {		
+
+	public static FileConfiguration loadModFile(File file,SideBarEntryType type) {
 		ZipFile zipFile;
 		try {
 			zipFile = new ZipFile(file);
@@ -68,10 +66,10 @@ public class FileLoader {
 		}
 		return null;
 	}
-	
+
 	public static ArrayList<FileConfiguration> loadModDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.scriptFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.scriptFolder.list();
 		for(String sFile : sFiles) {
 			if(sFile.endsWith(".2take1pack")) {
 				files.add(loadModFile(new File(TwoTakeOneTool.scriptFolder.getAbsoluteFile() + "\\" + sFile), SideBarEntryType.SCRIPT));
@@ -80,8 +78,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadSpriteDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.spriteFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.spriteFolder.list();
 		int cnt = 0;
 		for(String sFile : sFiles) {
 			if(cnt > startAmount) {
@@ -95,9 +93,9 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadProtectionDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.protectionFolder.list();	
-		
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.protectionFolder.list();
+
 		int cnt = 0;
 		for(String sFile : sFiles) {
 			if(cnt > startAmount) {
@@ -111,9 +109,9 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadTeleportDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.teleportFolder.list();	
-		
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.teleportFolder.list();
+
 		int cnt = 0;
 		for(String sFile : sFiles) {
 			if(cnt > startAmount) {
@@ -127,8 +125,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadAnimationDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.animationFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.animationFolder.list();
 
 		int cnt = 0;
 		for(String sFile : sFiles) {
@@ -143,8 +141,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadObjectDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.objectFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.objectFolder.list();
 
 		int cnt = 0;
 		for(String sFile : sFiles) {
@@ -159,8 +157,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadStatDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.statFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.statFolder.list();
 
 		int cnt = 0;
 		for(String sFile : sFiles) {
@@ -175,8 +173,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadVehicleDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.vehicleFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.vehicleFolder.list();
 
 		int cnt = 0;
 		for(String sFile : sFiles) {
@@ -191,8 +189,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadOutfitDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.outfitFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.outfitFolder.list();
 
 		int cnt = 0;
 		for(String sFile : sFiles) {
@@ -207,8 +205,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadLanguageDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.languageFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.languageFolder.list();
 
 		int cnt = 0;
 		for(String sFile : sFiles) {
@@ -223,8 +221,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadFontDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.fontFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.fontFolder.list();
 
 		int cnt = 0;
 		for(String sFile : sFiles) {
@@ -239,8 +237,8 @@ public class FileLoader {
 		return files;
 	}
 	public static ArrayList<FileConfiguration> loadConfigDirectory(){
-		ArrayList<FileConfiguration> files = new ArrayList<>();		
-		String[] sFiles = TwoTakeOneTool.configFolder.list();	
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.configFolder.list();
 
 		int cnt = 0;
 		for(String sFile : sFiles) {
@@ -255,7 +253,7 @@ public class FileLoader {
 		return files;
 	}
 	public static void deletePack(String name) {
-		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);	
+		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);
 		TwoTakeOneToolGui.instance.gui.pane.removePack(name);
 		try {
 			pack.close();
@@ -269,7 +267,7 @@ public class FileLoader {
 		pack.install();
 	}
 	public static void installWebPack(String name) {
-		
+
 		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);
 		pack.install();
 		//Copy Pack to right Folder
@@ -277,19 +275,19 @@ public class FileLoader {
 			pack.close();
 			TwoTakeOneToolGui.instance.gui.pane.removePack(name);
 			Files.move(
-					new File(pack.config.getPath()).toPath(), 
-					new File(TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName() + ".2take1pack").toPath(), 
+					new File(pack.config.getPath()).toPath(),
+					new File(TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName() + ".2take1pack").toPath(),
 					StandardCopyOption.REPLACE_EXISTING);
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
 	public static void deinstallPack(String name) {
-		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);	
+		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);
 		pack.deinstall();
 	}
 
-	public static FileConfiguration loadDataStorage() {	
+	public static FileConfiguration loadDataStorage() {
 		if(settings == null) {
 			try {
 				settings = new FileConfiguration(new Yaml(),new FileInputStream(new File(TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\data.yml")), TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\data.yml");
@@ -297,15 +295,15 @@ public class FileLoader {
 				e.printStackTrace();
 			}
 		}
-		return settings;		
+		return settings;
 	}
 
-	public static FileConfiguration loadNextPack(SideBarEntryType type,JSideBar bar) {	
+	public static FileConfiguration loadNextPack(SideBarEntryType type,JSideBar bar) {
 		if(type.equals(SideBarEntryType.WEB)) {
 			return loadNextWebPack(type, bar);
 		}
 		ZipFile zipFile;
-		String[] sFiles = TwoTakeOneTool.getPackFolderBySelectedEntry(bar.getSelectedEntry().getType()).list();				
+		String[] sFiles = TwoTakeOneTool.getPackFolderBySelectedEntry(bar.getSelectedEntry().getType()).list();
 		boolean nextFile = false;
 		for(String sFile : sFiles) {
 			try {
@@ -313,7 +311,7 @@ public class FileLoader {
 					nextFile = true;
 				}else if(nextFile) {
 					FileLoader.lastLoadedFile.put(type, sFile);
-					File file = new File(TwoTakeOneTool.getPackFolderBySelectedEntry(bar.getSelectedEntry().getType()) + "\\" + sFile);						
+					File file = new File(TwoTakeOneTool.getPackFolderBySelectedEntry(bar.getSelectedEntry().getType()) + "\\" + sFile);
 					zipFile = new ZipFile(file);
 					lastLoadedFile.put(type, file.getName());
 					Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -325,7 +323,7 @@ public class FileLoader {
 						    stream.close();
 						    return config;
 					    }
-					}						
+					}
 				}
 			} catch (ZipException e) {
 				e.printStackTrace();
@@ -333,8 +331,8 @@ public class FileLoader {
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.out.println("while loading package " + sFiles);
-			}	
-		}			
+			}
+		}
 		return null;
 	}
 
@@ -355,74 +353,75 @@ public class FileLoader {
 			if (url.contains(lastLoadedFile.get(type))) {
 				next = true;
 			}
-		}		
+		}
 		return null;
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	public static void loadWebPacks(SideBarEntryType type, String webPackFile) {
-		
+
 		if(loadWebPack != null) {
 			loadWebPack.interrupt();
 			loadWebPack.stop();
-			SwingUtilities.invokeLater(new Runnable() {				
+			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					TwoTakeOneToolGui.instance.gui.pane.clear();
 					clearTempPack();
 				}
 			});
-			
+
 		}
-		
-		loadWebPack = new Thread(new Runnable() {			
+
+		loadWebPack = new Thread(new Runnable() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void run() {
 				try {
 					URL url = new URL(webPackFile);
 					URLConnection urlConnection = url.openConnection();
-					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), webPackFile);			
+					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), webPackFile);
 					Object o = config.getSettings().get("packs");
-					if(o.getClass().equals(ArrayList.class)) {				
+					if(o.getClass().equals(ArrayList.class)) {
 						ArrayList<String> wpacks = (ArrayList<String>)o;
 						for(String webpackUrl  : wpacks) {
-							if(loadWebPack.isInterrupted()) {								
+							if(loadWebPack.isInterrupted()) {
 								return;
-							}else {							
+							}else {
 								if(TwoTakeOneToolGui.instance.gui.getToolBar().getSelectedEntryType().equals(type)) {
 									FileConfiguration webPackconfig = loadWebPack(type, webpackUrl);
 									if(webPackconfig != null) {
 										TwoTakeOnePackView pack = new TwoTakeOnePackView(webPackconfig, TwoTakeOneToolGui.instance.gui.getSideBar(), type);
 										pack.setWebPack(true);
 										TwoTakeOneToolGui.instance.gui.pane.addTwoTakeOnePackView(pack);
-										TwoTakeOneToolGui.instance.gui.repaint();	
-									}																
+										TwoTakeOneToolGui.instance.gui.repaint();
+									}
 								}else {
 									loadWebPack.interrupt();
 								}
-							}							
+							}
 						}
 						TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 					}else {
 						System.out.println("unknown type " + o.getClass());
-					}			
+					}
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "An Error occured while connecting to '" + webPackFile + "'","Error",JOptionPane.ERROR_MESSAGE);
 				}
 			}
-		});		
+		});
 		loadWebPack.start();
 	}
-	private static FileConfiguration loadWebPack(SideBarEntryType type, String webpackUrl) {		
+	private static FileConfiguration loadWebPack(SideBarEntryType type, String webpackUrl) {
 		if(webpackUrl.contains("packList.yml")) {
 			return null;
 		}
 		TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		String[] splittedString = webpackUrl.split("/");
 		String name = splittedString[splittedString.length-1].split(".2take1pack")[0] + ".2take1pack";
-		
+
 		try {
 			BufferedInputStream in = new BufferedInputStream(new URL(webpackUrl).openStream());
 			String path = TwoTakeOneTool.tempFolder + "\\" + name;
@@ -434,9 +433,10 @@ public class FileLoader {
 			}
 			fileOutputStream.flush();
 			fileOutputStream.close();
-			
+
 			FileLoader.lastLoadedFile.put(type, path);
-			File file = new File(path);						
+			File file = new File(path);
+			@SuppressWarnings("resource")
 			ZipFile zipFile = new ZipFile(file);
 			lastLoadedFile.put(SideBarEntryType.WEB, file.getName());
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -448,12 +448,12 @@ public class FileLoader {
 				    stream.close();
 				    return config;
 			    }
-			}		
+			}
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, "Error downloading '" + webpackUrl + "'");
 			System.out.println("Error downloading webpack '" + webpackUrl + "'");
 		}
-		return null;	
+		return null;
 	}
 	public static void clearTempPack() {
 		deleteDirectory(TwoTakeOneTool.tempFolder);
@@ -469,5 +469,34 @@ public class FileLoader {
 	    return directoryToBeDeleted.delete();
 	}
 
-	
+	/**
+	 * Dont use this, it will fill your ram since it has to check every packet...
+	 * @param name
+	 * @param version
+	 * @return
+	 */
+	public static TwoTakeOnePackView findPackByNameAndVersion(String name, String version) {
+		File dir = TwoTakeOneTool.mainFolder;
+		for(File packDir : dir.listFiles()) {
+			if(packDir.isDirectory()) {
+				for(File pack : packDir.listFiles()) {
+					if(pack.getName().endsWith(".2take1pack")) {
+						TwoTakeOnePackView loadedPack = new TwoTakeOnePackView(FileLoader.loadModFile(pack, SideBarEntryType.LOAD), TwoTakeOneToolGui.instance.gui.getSideBar(), SideBarEntryType.LOAD);
+						if(loadedPack.getName().equals(name) && loadedPack.getVersion().equals(version)) {
+							return loadedPack;
+						}else {
+							try {
+								loadedPack.close();
+								loadedPack = null;
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		}
+		System.gc();
+		return null;
+	}
 }

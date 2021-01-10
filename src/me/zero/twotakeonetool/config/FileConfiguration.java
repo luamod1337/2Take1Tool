@@ -26,7 +26,7 @@ import me.zero.twotakeonetool.view.TwoTakeOnePackView;
 public class FileConfiguration {
 
 	private Iterable<Object> itr;
-	
+
 	private HashMap<String, ArrayList<Object>> lists = new HashMap<>();
 	private HashMap<String, Double> listDouble = new HashMap<>();
 	private HashMap<String, String> listString = new HashMap<>();
@@ -34,13 +34,15 @@ public class FileConfiguration {
 	private String path;
 	private Yaml yaml;
 	private HashMap<String, Object> data;
-	
+	private InputStream stream;
+
 	public FileConfiguration(Yaml yaml,InputStream stream, ZipFile zipFile,String path) {
 		itr = yaml.loadAll(stream);
 		loadData(path);
 		this.zipFile = zipFile;
 		this.path = path;
 		this.yaml = yaml;
+		this.stream = stream;
 	}
 	public FileConfiguration(Yaml yaml,InputStream stream,String path) {
 		//itr = yaml.loadAll(stream);
@@ -51,12 +53,13 @@ public class FileConfiguration {
 		if(data == null) {
 			data = new HashMap<>();
 		}
+		this.stream = stream;
 	}
-	
+
 	public HashMap<String, Object> getSettings(){
 		return data;
 	}
-	
+
 	public void storeData(String key,Object gData) {
 		data.put(key, gData);
 		try {
@@ -65,17 +68,17 @@ public class FileConfiguration {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void loadData(String file) {
 		for (Object o : itr) {
-            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>)o;    
+            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>)o;
             if(o == null) {
-            	JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);            	
-            }else {            	
+            	JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);
+            }else {
             	for(String keys : data.keySet()) {
             		if( data.get(keys) == null) {
-                		JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);     
+                		JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);
                 	}else {
                 		if(data.get(keys).getClass().equals(ArrayList.class)) {
                     		lists.put(keys, (ArrayList<Object>) data.get(keys));
@@ -86,13 +89,13 @@ public class FileConfiguration {
                     	}else {
                     		System.out.println("unprocessed type found " + data.get(keys).getClass());
                     	}
-                	}                	
+                	}
                 }
-            }            
+            }
         }
 	}
-	
-	public ArrayList<Object> getList(String key){		
+
+	public ArrayList<Object> getList(String key){
 		return lists.get(key);
 	}
 	public Double getDouble(String key) {
@@ -102,7 +105,7 @@ public class FileConfiguration {
 		return listString.get(key);
 	}
 
-	public InputStream loadImage(String imagePath) throws IOException {		
+	public InputStream loadImage(String imagePath) throws IOException {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while(entries.hasMoreElements()){
 	        ZipEntry entry = entries.nextElement();
@@ -112,13 +115,13 @@ public class FileConfiguration {
 	    }
 		return null;
 	}
-	public InputStream loadFile(String imagePath) throws IOException {		
+	public InputStream loadFile(String imagePath) throws IOException {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while(entries.hasMoreElements()){
 	        ZipEntry entry = entries.nextElement();
 	        if(entry.getName().equalsIgnoreCase(imagePath)) {
 	        	return zipFile.getInputStream(entry);
-	        }	        
+	        }
 	    }
 		return null;
 	}
@@ -127,13 +130,18 @@ public class FileConfiguration {
 	}
 
 	public void close() throws IOException {
-		this.zipFile.close();		
+		if(zipFile != null) {
+			this.zipFile.close();
+		}
+		if(stream != null) {
+			stream.close();
+		}
 	}
 
-	public void install(File folder) throws IOException {		
+	public void install(File folder) throws IOException {
 		ArrayList<Object> copyFolder = getList("CopyFolder");
 		ArrayList<Object> CopyFiles = getList("CopyFiles");
-		
+
 		ZipInputStream zis = new ZipInputStream(new FileInputStream(this.path));
         ZipEntry zipEntry = zis.getNextEntry();
         byte[] buffer = new byte[1024];
@@ -150,7 +158,7 @@ public class FileConfiguration {
 	            if (!parent.isDirectory() && !parent.mkdirs()) {
 	            	zis.close();
 	            	throw new IOException("Failed to create directory " + parent);
-	            }	                
+	            }
 	            // write file content
 	            FileOutputStream fos = new FileOutputStream(newFile);
 	            int len;
@@ -173,9 +181,9 @@ public class FileConfiguration {
 				}catch(NoSuchFileException e) {
 					JOptionPane.showMessageDialog(null, "Couldn't delete file, did it got deleted manually ?","Error",JOptionPane.ERROR_MESSAGE);
 				}
-				
+
 			}
-		}		
+		}
 		if(copyFolder != null) {
 			for(Object o : copyFolder) {
 				deleteDirectory(new File(TwoTakeOneTool.scriptFolderMod.getAbsolutePath() + "\\" + o.toString()));
@@ -185,7 +193,7 @@ public class FileConfiguration {
 	private boolean isInList(String str,ArrayList<Object> data) {
 		if(data == null) {
 			return false;
-		}		
+		}
 		for(Object o : data) {
 			if(str.contains(o.toString())) {
 				return true;

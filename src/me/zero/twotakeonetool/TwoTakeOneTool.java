@@ -1,11 +1,24 @@
 package me.zero.twotakeonetool;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 
+import org.yaml.snakeyaml.Yaml;
+
+import me.zero.twotakeonetool.config.FileConfiguration;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 import me.zero.twotakeonetool.view.TwoTakeOnePackView;
 import me.zero.twotakeonetool.view.TwoTakeOneToolGui;
@@ -28,9 +41,8 @@ public class TwoTakeOneTool {
 	public static File languageFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\language");
 	public static File configFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\config");
 	public static File tempFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\temp");
-	
+
 	public static File settingsFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\settings");
-	
 
 	public static File scriptFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\scripts\\");
 	public static File spriteFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\sprites\\");
@@ -40,27 +52,101 @@ public class TwoTakeOneTool {
 	public static File languageFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\");
 	public static File fontFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\");
 
-	
-	
 	public static void main(String[] args) {
-		
-		
+
+
 		installIfNeeded();
-		
+
 		gui.setBounds(0, 0, 1000, 800);
 		gui.setBackground(Color.WHITE);
 		gui.setVisible(true);
-		
-		//FileChooser choose = new FileChooser();		
+
+		//FileChooser choose = new FileChooser();
 		//FileLoader.loadModFolder(choose.showOpenDialog(null));
+
+		HashMap<String, Object> data = FileLoader.loadDataStorage().getSettings();
+
+		@SuppressWarnings("unchecked")
+		ArrayList<HashMap<String, String>> dataList = (ArrayList<HashMap<String, String>>) data.get("installedPack");
+		if(dataList == null) dataList = new ArrayList<>();
+		try {
+			for(HashMap<String, String> installedPack : dataList) {
+				String Packpath = installedPack.get("Path");
+
+				File packFile = new File(Packpath);
+				if(packFile.exists()) {
+					TwoTakeOnePackView pack = new TwoTakeOnePackView(FileLoader.loadModFile(packFile, SideBarEntryType.LOAD), TwoTakeOneToolGui.instance.gui.getSideBar(), SideBarEntryType.LOAD);
+					TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+					if(pack.updateUrl != null) {
+						try {
+							URL url = new URL(pack.updateUrl);
+							URLConnection urlConnection = url.openConnection();
+							FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), pack.updateUrl);
+							String updateUrl = config.getSettings().get("updateUrl").toString();
+							String updateVersion = config.getSettings().get("version").toString();
+
+							if(updateUrl != null && updateVersion != null) {
+								if(!updateVersion.toString().equalsIgnoreCase(pack.getVersion().toString())) {
+									int option = JOptionPane.showConfirmDialog(null, "Update '" + updateVersion + "' found, download ?","Update found",JOptionPane.OK_CANCEL_OPTION);
+									if(option == JOptionPane.OK_OPTION) {
+										try {
+											BufferedInputStream in = new BufferedInputStream(new URL(updateUrl).openStream());
+											String path = TwoTakeOneTool.getPackFolderBySelectedEntry(pack) + "\\" + pack.getName() + "_" + updateVersion + ".2take1pack";
+											FileOutputStream fileOutputStream = new FileOutputStream(path);
+											byte dataBuffer[] = new byte[1024];
+											int bytesRead;
+											while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+												fileOutputStream.write(dataBuffer, 0, bytesRead);
+											}
+											fileOutputStream.flush();
+											fileOutputStream.close();
+											JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
+										} catch (IOException e) {
+											System.out.println("Error downloading '" + updateUrl + "'");
+											JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "'");
+										}
+									}
+								}
+							}else {
+								JOptionPane.showMessageDialog(null, "Error: No 'updateUrl' or 'version' found!","Error",JOptionPane.ERROR_MESSAGE);
+							}
+							pack.close();
+						} catch (IOException e) {
+							JOptionPane.showMessageDialog(null, "Error checking webpage '" + pack.updateUrl + "'");
+							e.printStackTrace();
+						}
+					}
+					pack = null;
+					TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				}else {
+					System.out.println("pack not found!");
+				}
+			}
+		}catch(ClassCastException ex) {
+			JOptionPane.showMessageDialog(null, "Your config is old and outdated, please reinstall packs to register them","Error",JOptionPane.ERROR_MESSAGE);
+			try {
+				FileLoader.loadDataStorage().close();
+				File dataFile = new File(TwoTakeOneTool.settingsFolder.toPath() + "\\data.yml");
+				Files.delete(dataFile.toPath());
+				dataFile.createNewFile();
+
+				BufferedWriter writer = new BufferedWriter(new FileWriter(dataFile));
+				writer.write("installedPack: []");
+				writer.flush();
+				writer.close();
+				data.clear();
+			} catch (IOException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Couldnt clear settings file!","Error",JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
-	
-	
+
 	private static void installIfNeeded() {
 		if(!mainFolder.exists()) {
 			//installieren
 			mainFolder.mkdir();
-			
+
 			spriteFolder.mkdir();
 			scriptFolder.mkdir();
 			protectionFolder.mkdir();
@@ -81,11 +167,11 @@ public class TwoTakeOneTool {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 			JOptionPane.showMessageDialog(null, "Installation of 2Take1Tool successfull!");
 		}
 	}
-	
+
 	public static File getInstallFolderBySelectedEntry(SideBarEntryType type) {
 		if(type.equals(SideBarEntryType.SPRITE)) {
 			return spriteFolderMod;
@@ -132,7 +218,7 @@ public class TwoTakeOneTool {
 	public static File getPackFolderBySelectedEntry(TwoTakeOnePackView twoTakeOnePackView) {
 		return getPackFolderBySelectedEntry(twoTakeOnePackView.getType());
 	}
-	
+
 	public static String getIconUrlBySidebarEntry(SideBarEntryType type) {
 		if(type.equals(SideBarEntryType.SPRITE)) {
 			return "/ressources/images/image.png";
