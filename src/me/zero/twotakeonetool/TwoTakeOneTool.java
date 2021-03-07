@@ -1,7 +1,10 @@
 package me.zero.twotakeonetool;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,18 +17,24 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.yaml.snakeyaml.Yaml;
 
 import me.zero.twotakeonetool.config.FileConfiguration;
+import me.zero.twotakeonetool.lang.Language;
+import me.zero.twotakeonetool.lang.LanguageKey;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 import me.zero.twotakeonetool.view.TwoTakeOnePackView;
 import me.zero.twotakeonetool.view.TwoTakeOneToolGui;
 
 public class TwoTakeOneTool {
 
-	private static TwoTakeOneToolGui gui = new TwoTakeOneToolGui();
 
 	public static File mainFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool");
 	public static File spriteFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\sprite");
@@ -52,11 +61,12 @@ public class TwoTakeOneTool {
 	public static File languageFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\");
 	public static File fontFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\");
 
+	private static TwoTakeOneToolGui gui = new TwoTakeOneToolGui();
+	
 	public static void main(String[] args) {
 
 
 		installIfNeeded();
-
 		gui.setBounds(0, 0, 1000, 800);
 		gui.setBackground(Color.WHITE);
 		gui.setVisible(true);
@@ -87,7 +97,8 @@ public class TwoTakeOneTool {
 
 							if(updateUrl != null && updateVersion != null) {
 								if(!updateVersion.toString().equalsIgnoreCase(pack.getVersion().toString())) {
-									int option = JOptionPane.showConfirmDialog(null, "Update '" + updateVersion + "' found, download ?","Update found",JOptionPane.OK_CANCEL_OPTION);
+									//int option = JOptionPane.showConfirmDialog(null, "Update '" + updateVersion + "' found, download ?","Update found",JOptionPane.OK_CANCEL_OPTION);
+									int option = JOptionPane.showConfirmDialog(null, Language.getTranslatedString(LanguageKey.UPDATE_FOUND).replace("<updateVersion>", updateVersion), Language.getTranslatedString(LanguageKey.UPDATE_FOUND_TITLE),JOptionPane.OK_CANCEL_OPTION);
 									if(option == JOptionPane.OK_OPTION) {
 										try {
 											BufferedInputStream in = new BufferedInputStream(new URL(updateUrl).openStream());
@@ -100,30 +111,34 @@ public class TwoTakeOneTool {
 											}
 											fileOutputStream.flush();
 											fileOutputStream.close();
-											JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
+											//JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
+											JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.UPDATE_DOWNLOADED).replace("<path>", path),Language.getTranslatedString(LanguageKey.SUCCESSFULL),JOptionPane.INFORMATION_MESSAGE);
 										} catch (IOException e) {
-											System.out.println("Error downloading '" + updateUrl + "'");
-											JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "'");
+											//JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "'");
+											JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.DOWNLOAD_ERROR).replace("<updateUrl>", updateUrl));
 										}
 									}
 								}
 							}else {
-								JOptionPane.showMessageDialog(null, "Error: No 'updateUrl' or 'version' found!","Error",JOptionPane.ERROR_MESSAGE);
+								//JOptionPane.showMessageDialog(null, "Error: No 'updateUrl' or 'version' found!","Error",JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.UPDATE_CONFIGURATION_ERROR),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 							}
 							pack.close();
 						} catch (IOException e) {
-							JOptionPane.showMessageDialog(null, "Error checking webpage '" + pack.updateUrl + "'");
+							//JOptionPane.showMessageDialog(null, "Error checking webpage '" + pack.updateUrl + "'");
+							JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_WEBPAGE).replace("<updateUrl>", pack.updateUrl),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 							e.printStackTrace();
 						}
 					}
 					pack = null;
 					TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				}else {
-					System.out.println("pack not found!");
+					JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_MISSING_PACKFILE).replace("<Packpath>", Packpath),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}catch(ClassCastException ex) {
-			JOptionPane.showMessageDialog(null, "Your config is old and outdated, please reinstall packs to register them","Error",JOptionPane.ERROR_MESSAGE);
+			//JOptionPane.showMessageDialog(null, "Your config is old and outdated, please reinstall packs to register them","Error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.OUTDATE_CONFIG),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 			try {
 				FileLoader.loadDataStorage().close();
 				File dataFile = new File(TwoTakeOneTool.settingsFolder.toPath() + "\\data.yml");
@@ -137,12 +152,13 @@ public class TwoTakeOneTool {
 				data.clear();
 			} catch (IOException e) {
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(null, "Couldnt clear settings file!","Error",JOptionPane.ERROR_MESSAGE);
+				//JOptionPane.showMessageDialog(null, "Couldnt clear settings file!","Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.FILE_ERROR),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
-	private static void installIfNeeded() {
+	private static void installIfNeeded() {		
 		if(!mainFolder.exists()) {
 			//installieren
 			mainFolder.mkdir();
@@ -168,7 +184,7 @@ public class TwoTakeOneTool {
 				e.printStackTrace();
 			}
 
-			JOptionPane.showMessageDialog(null, "Installation of 2Take1Tool successfull!");
+			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.INSTALLED));
 		}
 	}
 
@@ -188,7 +204,8 @@ public class TwoTakeOneTool {
 		}else if(type.equals(SideBarEntryType.PROTECTION) || type.equals(SideBarEntryType.ANIMATION) || type.equals(SideBarEntryType.STAT) || type.equals(SideBarEntryType.TELEPORT) || type.equals(SideBarEntryType.OBJECT)) {
 			return cfgFolderMod;
 		}else {
-			JOptionPane.showMessageDialog(null, "Unknown install folder for type " + type.name());
+			//JOptionPane.showMessageDialog(null, "Unknown install folder for type " + type.name());
+			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.UNKNOWN_TYP).replace("<typ>", type.name()));
 		}
 		return null;
 	}
@@ -202,16 +219,26 @@ public class TwoTakeOneTool {
 			return scriptFolder;
 		}else if(type.equals(SideBarEntryType.VEHICLE)) {
 			return vehicleFolder;
-		}else if(type.equals(SideBarEntryType.LANGUAGE) || type.equals(SideBarEntryType.CONFIG)) {
+		}else if(type.equals(SideBarEntryType.LANGUAGE)) {
 			return languageFolder;
 		}else if(type.equals(SideBarEntryType.FONT)) {
 			return fontFolder;
 		}else if(type.equals(SideBarEntryType.OUTFIT)) {
 			return outfitFolderMod;
-		}else if(type.equals(SideBarEntryType.PROTECTION) || type.equals(SideBarEntryType.ANIMATION) || type.equals(SideBarEntryType.STAT) || type.equals(SideBarEntryType.TELEPORT) || type.equals(SideBarEntryType.OBJECT)) {
+		}else if(type.equals(SideBarEntryType.TELEPORT)) {
+			return teleportFolder;
+		}else if(type.equals(SideBarEntryType.ANIMATION)) {
+			return animationFolder;
+		}else if(type.equals(SideBarEntryType.STAT)) {
+			return statFolder;
+		}else if(type.equals(SideBarEntryType.OBJECT)) {
+			return objectFolder;
+		}else if(type.equals(SideBarEntryType.CONFIG)) {
 			return configFolder;
+		}else if(type.equals(SideBarEntryType.PROTECTION)) {
+			return protectionFolder;
 		}else {
-			JOptionPane.showMessageDialog(null, "Unknown install folder for type " + type.name());
+			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.UNKNOWN_TYP).replace("<typ>", type.name()));
 		}
 		return null;
 	}
@@ -245,7 +272,7 @@ public class TwoTakeOneTool {
 		}else if(type.equals(SideBarEntryType.OBJECT)) {
 			return "/ressources/images/object.png";
 		}else {
-			JOptionPane.showMessageDialog(null, "Unknown install folder for type " + type.name());
+			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.UNKNOWN_TYP).replace("<typ>", type.name()));
 		}
 		return null;
 	}

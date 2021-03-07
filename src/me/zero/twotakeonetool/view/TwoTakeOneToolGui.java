@@ -28,6 +28,8 @@ import org.yaml.snakeyaml.Yaml;
 import me.zero.twotakeonetool.FileLoader;
 import me.zero.twotakeonetool.TwoTakeOneTool;
 import me.zero.twotakeonetool.config.FileConfiguration;
+import me.zero.twotakeonetool.lang.Language;
+import me.zero.twotakeonetool.lang.LanguageKey;
 
 public class TwoTakeOneToolGui extends JFrame{
 
@@ -61,8 +63,8 @@ public class TwoTakeOneToolGui extends JFrame{
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				String updateUrlFile = "https://raw.githubusercontent.com/luamod1337/2Take1Tool/master/src/ressources/files/update.yml";
 				try {
-					String updateUrlFile = "https://raw.githubusercontent.com/luamod1337/2Take1Tool/master/src/ressources/files/update.yml";
 					URL url = new URL(updateUrlFile);
 					URLConnection urlConnection = url.openConnection();
 					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), updateUrlFile);
@@ -73,7 +75,7 @@ public class TwoTakeOneToolGui extends JFrame{
 
 					if(updateUrl != null && updateVersion != null) {
 						if(!updateVersion.toString().equalsIgnoreCase(version)) {
-							int option = JOptionPane.showConfirmDialog(null, "Update '" + updateVersion + "' found, download ?","Update found",JOptionPane.OK_CANCEL_OPTION);
+							int option = JOptionPane.showConfirmDialog(null, Language.getTranslatedString(LanguageKey.UPDATE_FOUND).replace("<updateVersion>", updateVersion), Language.getTranslatedString(LanguageKey.UPDATE_FOUND_TITLE),JOptionPane.OK_CANCEL_OPTION);
 							if(option == JOptionPane.OK_OPTION) {
 								try {
 									BufferedInputStream in = new BufferedInputStream(new URL(updateUrl).openStream());
@@ -85,9 +87,10 @@ public class TwoTakeOneToolGui extends JFrame{
 									}
 									fileOutputStream.flush();
 									fileOutputStream.close();
-									JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
-
-									int restart = JOptionPane.showConfirmDialog(null, "2Take1Tool needs to be restarted, in order to complete the update, restart now ?","Reboot 2Take1Tool ?",JOptionPane.OK_CANCEL_OPTION);
+									JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.UPDATE_DOWNLOADED).replace("<path>", path),Language.getTranslatedString(LanguageKey.SUCCESSFULL),JOptionPane.INFORMATION_MESSAGE);
+									
+									//int restart = JOptionPane.showConfirmDialog(null, "2Take1Tool needs to be restarted, in order to complete the update, restart now ?","Reboot 2Take1Tool ?",JOptionPane.OK_CANCEL_OPTION);
+									int restart = JOptionPane.showConfirmDialog(null, Language.getTranslatedString(LanguageKey.REQUIRED_RESTART),Language.getTranslatedString(LanguageKey.REQUIRED_RESTART_TITLE),JOptionPane.OK_CANCEL_OPTION);
 
 									if(restart == JOptionPane.OK_OPTION) {
 										System.exit(0);
@@ -95,13 +98,13 @@ public class TwoTakeOneToolGui extends JFrame{
 
 								} catch (IOException e) {
 									e.printStackTrace();
-									JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "' " + e.getMessage());
+									JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.DOWNLOAD_ERROR).replace("<updateUrl>", updateUrl));
 								}
 							}
 						}
 					}
 				} catch (IOException e) {
-					JOptionPane.showMessageDialog(null, "Error checking webpage for updates");
+					JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_WEBPAGE).replace("<updateUrl>", updateUrlFile),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 					e.printStackTrace();
 				} catch (URISyntaxException e1) {
 					e1.printStackTrace();

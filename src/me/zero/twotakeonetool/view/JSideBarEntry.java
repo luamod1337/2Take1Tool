@@ -1,5 +1,6 @@
 package me.zero.twotakeonetool.view;
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -61,6 +62,7 @@ public class JSideBarEntry extends JComponent{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D)g;
+		g2.setFont(new Font("Open Sans, Lucida Sans", Font.PLAIN, 20));
 		if(parent.isOpen()) {
 			g2.drawImage(image, x, y-20, null);
 			g2.drawString(text, x+30, y);

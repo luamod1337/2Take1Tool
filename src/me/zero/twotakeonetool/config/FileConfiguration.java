@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import org.yaml.snakeyaml.Yaml;
 
 import me.zero.twotakeonetool.TwoTakeOneTool;
+import me.zero.twotakeonetool.lang.Language;
+import me.zero.twotakeonetool.lang.LanguageKey;
 import me.zero.twotakeonetool.view.TwoTakeOnePackView;
 
 public class FileConfiguration {
@@ -74,11 +76,12 @@ public class FileConfiguration {
 		for (Object o : itr) {
             LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>)o;
             if(o == null) {
-            	JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);
+            	JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_LOADING).replace("<file>", file).replace("<object>", o.toString()));
             }else {
             	for(String keys : data.keySet()) {
             		if( data.get(keys) == null) {
-                		JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);
+                		//JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);
+                		JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_LOADING).replace("<file>", file).replace("<object>", o.toString()));
                 	}else {
                 		if(data.get(keys).getClass().equals(ArrayList.class)) {
                     		lists.put(keys, (ArrayList<Object>) data.get(keys));
@@ -179,7 +182,8 @@ public class FileConfiguration {
 				try {
 					Files.delete(new File(TwoTakeOneTool.getInstallFolderBySelectedEntry(pack).getAbsolutePath() + "\\" + o.toString()).toPath());
 				}catch(NoSuchFileException e) {
-					JOptionPane.showMessageDialog(null, "Couldn't delete file, did it got deleted manually ?","Error",JOptionPane.ERROR_MESSAGE);
+					//JOptionPane.showMessageDialog(null, "Couldn't delete file, did it got deleted manually ?","Error",JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_MISSING_PACKFILE).replace("<packpath>", pack.getName()),"Error",JOptionPane.ERROR_MESSAGE);
 				}
 
 			}

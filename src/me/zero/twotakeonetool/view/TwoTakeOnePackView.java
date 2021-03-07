@@ -25,6 +25,8 @@ import org.yaml.snakeyaml.Yaml;
 import me.zero.twotakeonetool.FileLoader;
 import me.zero.twotakeonetool.TwoTakeOneTool;
 import me.zero.twotakeonetool.config.FileConfiguration;
+import me.zero.twotakeonetool.lang.Language;
+import me.zero.twotakeonetool.lang.LanguageKey;
 import me.zero.twotakeonetool.type.InstallStatus;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 import me.zero.twotakeonetool.util.Description;
@@ -62,15 +64,15 @@ public class TwoTakeOnePackView extends JComponent{
 		name = config.getString("Name");
 		version = config.getString("Version");
 		try {
-			install = new JSideBarEntry("install",ImageIO.read(getClass().getResource("/ressources/images/install.png")), bar, new Consumer<JSideBarEntry>() {
+			install = new JSideBarEntry(Language.getTranslatedString(LanguageKey.INSTALL),ImageIO.read(getClass().getResource("/ressources/images/install.png")), bar, new Consumer<JSideBarEntry>() {
 				@Override
 				public void accept(JSideBarEntry t) {
+					String path  = t.getPack().config.getPath();
 					if(isWebPack) {
-						FileLoader.installWebPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+						path = FileLoader.installWebPack(t.getPack().getName() + ":" + t.getPack().getVersion());
 					}else {
 						FileLoader.installPack(t.getPack().getName() + ":" + t.getPack().getVersion());
 					}
-
 					HashMap<String, Object> data = FileLoader.loadDataStorage().getSettings();
 					@SuppressWarnings("unchecked")
 					ArrayList<HashMap<String, String>> dataList = (ArrayList<HashMap<String, String>>) data.get("installedPack");
@@ -78,7 +80,7 @@ public class TwoTakeOnePackView extends JComponent{
 					HashMap<String, String> hashmapdata = new HashMap<String, String>();
 					hashmapdata.put("Name", t.getPack().getName());
 					hashmapdata.put("Version", t.getPack().getVersion());
-					hashmapdata.put("Path", t.getPack().config.getPath());
+					hashmapdata.put("Path", path);
 					dataList.add(hashmapdata);
 					FileLoader.loadDataStorage().storeData("installedPack", dataList);
 				}
@@ -138,20 +140,19 @@ public class TwoTakeOnePackView extends JComponent{
 											}
 											fileOutputStream.flush();
 											fileOutputStream.close();
-											JOptionPane.showMessageDialog(null, "Successfully downloaded File to '" + path + "'","Success",JOptionPane.INFORMATION_MESSAGE);
+											JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.UPDATE_DOWNLOADED).replace("<path>", path),Language.getTranslatedString(LanguageKey.SUCCESSFULL),JOptionPane.INFORMATION_MESSAGE);
 										} catch (IOException e) {
-											System.out.println("Error downloading '" + updateUrl + "'");
-											JOptionPane.showMessageDialog(null, "Error downloading '" + updateUrl + "'");
+											JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.DOWNLOAD_ERROR).replace("<updateUrl>", updateUrl));
 										}
 									}
-								}else {
-									JOptionPane.showMessageDialog(null, "Update File has the same Version as your local copy '" + t.getPack().getVersion() + "'");
+								}else {									
+									JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.NO_UPDATE_NEEDED).replace("<version>", t.getPack().getVersion()));
 								}
 							}else {
-								JOptionPane.showMessageDialog(null, "Error: No 'updateUrl' or 'version' found!","Error",JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.UPDATE_CONFIGURATION_ERROR),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 							}
 						} catch (IOException e) {
-							JOptionPane.showMessageDialog(null, "Error checking webpage '" + t.getPack().updateUrl + "'");
+							JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_WEBPAGE).replace("<updateUrl>", updateUrl),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 							e.printStackTrace();
 						}
 						TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -179,7 +180,7 @@ public class TwoTakeOnePackView extends JComponent{
 		if(found) {
 			//allready installed
 			this.status = InstallStatus.INSTALLED;
-			install.setText("deinstall");
+			install.setText(Language.getTranslatedString(LanguageKey.DEINSTALL));
 			install.setWidth(110);
 			install.setType(SideBarEntryType.DEINSTALL);
 			install.setX(TwoTakeOneToolGui.instance.getWidth()-280);
@@ -235,7 +236,7 @@ public class TwoTakeOnePackView extends JComponent{
 		g2.setFont(new Font("Open Sans, Lucida Sans", Font.PLAIN, 30));
 		//Name
 
-		g2.drawString(name + " Version: " + version, bar.getWidth()+10, y+30);
+		g2.drawString(name + " " + Language.getTranslatedString(LanguageKey.VERSION) + ": " + version, bar.getWidth()+10, y+30);
 		//Logo
 		try {
 			InputStream stream = config.loadImage(config.getString("Logo"));
@@ -318,7 +319,7 @@ public class TwoTakeOnePackView extends JComponent{
 		try {
 			config.install(TwoTakeOneTool.getInstallFolderBySelectedEntry(this));
 			status = InstallStatus.INSTALLED;
-			install.setText("deinstall");
+			install.setText(Language.getTranslatedString(LanguageKey.DEINSTALL));
 			install.setWidth(110);
 			install.setType(SideBarEntryType.DEINSTALL);
 			install.setX(TwoTakeOneToolGui.instance.getWidth()-280);
@@ -345,9 +346,9 @@ public class TwoTakeOnePackView extends JComponent{
 			});
 			this.repaint();
 			if(isWebPack) {
-				JOptionPane.showMessageDialog(null, "Installed " + this.getName() + " Version: " + this.getVersion() + ", you can find this pack inside its category!");
+				JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.WEBPACK_INSTALLED).replace("<name>", this.getName()).replace("<version>", this.getVersion()));
 			}else {
-				JOptionPane.showMessageDialog(null, "Installed " + this.getName() + " Version: " + this.getVersion());
+				JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.PACK_INSTALLED).replace("<name>", this.getName()).replace("<version>", this.getVersion()));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -357,7 +358,7 @@ public class TwoTakeOnePackView extends JComponent{
 		try {
 			config.deinstall(this);
 			status = InstallStatus.READY_TO_INSTALL;
-			install.setText("install");
+			install.setText(Language.getTranslatedString(LanguageKey.INSTALL));
 			install.setWidth(90);
 			install.setType(SideBarEntryType.INSTALL);
 			install.setX(TwoTakeOneToolGui.instance.getWidth()-300);
@@ -383,7 +384,7 @@ public class TwoTakeOnePackView extends JComponent{
 				}
 			});
 			this.repaint();
-			JOptionPane.showMessageDialog(null, "Deinstalled " + this.getName() + " Version: " + this.getVersion());
+			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.PACK_DEINSTALLED).replace("<name>", this.getName()).replace("<version>", this.getVersion()));
 			} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -1,13 +1,20 @@
 package me.zero.twotakeonetool;
 
+import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -20,13 +27,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.yaml.snakeyaml.Yaml;
 
 import me.zero.twotakeonetool.config.FileConfiguration;
-import me.zero.twotakeonetool.controller.SidebarMouseListener;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 import me.zero.twotakeonetool.view.JSideBar;
 import me.zero.twotakeonetool.view.TwoTakeOnePackView;
@@ -34,7 +45,7 @@ import me.zero.twotakeonetool.view.TwoTakeOneToolGui;
 
 public class FileLoader {
 
-	private static FileConfiguration settings;
+	private static FileConfiguration settings,lang;
 	private static HashMap<SideBarEntryType, String> lastLoadedFile = new HashMap<>();
 	private static int startAmount = 3;
 
@@ -42,6 +53,8 @@ public class FileLoader {
 
 	private static Thread loadWebPack;
 
+	private static String selected_lang = "english";
+	
 	public static FileConfiguration loadModFile(File file,SideBarEntryType type) {
 		ZipFile zipFile;
 		try {
@@ -266,21 +279,24 @@ public class FileLoader {
 		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);
 		pack.install();
 	}
-	public static void installWebPack(String name) {
-
+	public static String installWebPack(String name) {
 		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);
 		pack.install();
 		//Copy Pack to right Folder
 		try {
 			pack.close();
 			TwoTakeOneToolGui.instance.gui.pane.removePack(name);
+			
+			System.out.println(pack.getType());
 			Files.move(
 					new File(pack.config.getPath()).toPath(),
 					new File(TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName() + ".2take1pack").toPath(),
 					StandardCopyOption.REPLACE_EXISTING);
+			return TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName() + ".2take1pack";
 		}catch(IOException e) {
 			e.printStackTrace();
-		}
+		}		
+		return null;
 	}
 	public static void deinstallPack(String name) {
 		TwoTakeOnePackView pack = TwoTakeOneToolGui.instance.gui.pane.getPack(name);
@@ -296,6 +312,68 @@ public class FileLoader {
 			}
 		}
 		return settings;
+	}
+	
+	private static void selectLanguage() {
+		//Select Language
+		if(!new File(TwoTakeOneTool.settingsFolder.getAbsolutePath() + "/lang.yml").exists()) {
+			JDialog dialog = new JDialog();
+			JPanel panel = new JPanel(new BorderLayout());
+			JLabel label = new JLabel("Please select a language");
+			JComboBox<String> box = new JComboBox<>();
+			box.addItem("English");
+			box.addItem("Deutsch");
+			box.addItem("French");
+			JButton button = new JButton("Select");
+			button.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					selected_lang = box.getSelectedItem().toString();
+					dialog.dispose();
+				}
+			});
+			panel.add(label,BorderLayout.NORTH);
+			panel.add(box,BorderLayout.CENTER);
+			panel.add(button,BorderLayout.SOUTH);
+			
+			dialog.add(panel);
+			dialog.setLocationRelativeTo(null);
+			dialog.pack();
+			dialog.setModal(true);
+			dialog.setVisible(true);
+		}
+	}
+	
+	public static FileConfiguration loadLanguageStorage() {
+		if(lang == null) {
+			selectLanguage();
+			System.out.println("selected: " + selected_lang);
+			try {
+				File langConf = new File(TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\lang.yml");
+				if(!langConf.exists()) {
+					try {
+						langConf.createNewFile();
+						System.out.println("reading: " + "/ressources/files/lang_" + selected_lang  + ".yml");
+						BufferedReader reader = new BufferedReader(new InputStreamReader(TwoTakeOneToolGui.instance.getClass().getResourceAsStream("/ressources/files/lang_" + selected_lang + ".yml")));
+						BufferedWriter writer = new BufferedWriter(new FileWriter(langConf));
+						String line;
+				        while ((line = reader.readLine()) != null) {
+				            //resultStringBuilder.append(line).append("\n");
+				        	writer.write(line);
+				        	writer.newLine();
+				        }
+				        writer.close();
+				        reader.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}					
+				}
+				lang = new FileConfiguration(new Yaml(),new FileInputStream(langConf), TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\data.yml");
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		return lang;
 	}
 
 	public static FileConfiguration loadNextPack(SideBarEntryType type,JSideBar bar) {
@@ -421,7 +499,6 @@ public class FileLoader {
 		TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		String[] splittedString = webpackUrl.split("/");
 		String name = splittedString[splittedString.length-1].split(".2take1pack")[0] + ".2take1pack";
-
 		try {
 			BufferedInputStream in = new BufferedInputStream(new URL(webpackUrl).openStream());
 			String path = TwoTakeOneTool.tempFolder + "\\" + name;

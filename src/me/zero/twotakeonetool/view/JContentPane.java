@@ -30,6 +30,8 @@ import org.yaml.snakeyaml.Yaml;
 import me.zero.twotakeonetool.FileLoader;
 import me.zero.twotakeonetool.TwoTakeOneTool;
 import me.zero.twotakeonetool.config.FileConfiguration;
+import me.zero.twotakeonetool.lang.Language;
+import me.zero.twotakeonetool.lang.LanguageKey;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 
 
@@ -104,7 +106,8 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			packKeys.add((pack.config.getString("Name")+":" + pack.config.getString("Version")));
 			this.packs.put((pack.config.getString("Name")+":" + pack.config.getString("Version")),pack);
 		}else {
-			JOptionPane.showMessageDialog(null, "Duplicate Pack found '" + (pack.config.getString("Name")+":" + pack.config.getString("Version")) + "'");
+			//JOptionPane.showMessageDialog(null, "Duplicate Pack found '" + (pack.config.getString("Name")+":" + pack.config.getString("Version")) + "'");
+			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.DUPLICATE_PACK).replace("<name>", pack.config.getString("Name")).replace("<version>", pack.config.getString("Version")));
 		}
 	}
 
@@ -133,7 +136,7 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 					public void accept(JSideBarEntry t) {
 						if(bar.getSelectedEntry() != null){
 							JFileChooser chooser = new JFileChooser();
-							chooser.setDialogTitle("Select a pack of type '" + bar.getSelectedEntry().getType() + "'");
+							chooser.setDialogTitle(Language.getTranslatedString(LanguageKey.SELECT_PACK).replace("<typ>", bar.getSelectedEntry().getType().name()));
 							chooser.setAcceptAllFileFilterUsed(false);
 							chooser.setFileFilter(new FileFilter() {							
 								@Override

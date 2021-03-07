@@ -21,6 +21,8 @@ import javax.swing.filechooser.FileFilter;
 import me.zero.twotakeonetool.FileLoader;
 import me.zero.twotakeonetool.TwoTakeOneTool;
 import me.zero.twotakeonetool.config.FileConfiguration;
+import me.zero.twotakeonetool.lang.Language;
+import me.zero.twotakeonetool.lang.LanguageKey;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 
 public class JToolToolBar extends JComponent{
@@ -39,7 +41,7 @@ public class JToolToolBar extends JComponent{
 				public void accept(JSideBarEntry t) {
 					if(bar.getSelectedEntry() != null){
 						JFileChooser chooser = new JFileChooser();
-						chooser.setDialogTitle("Select a pack of type '" + bar.getSelectedEntry().getType() + "'");
+						chooser.setDialogTitle(Language.getTranslatedString(LanguageKey.SELECT_PACK).replace("<typ>", bar.getSelectedEntry().getType().name()));
 						chooser.setAcceptAllFileFilterUsed(false);
 						chooser.setFileFilter(new FileFilter() {							
 							@Override

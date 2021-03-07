@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
 import me.zero.twotakeonetool.controller.SidebarMouseListener;
+import me.zero.twotakeonetool.lang.Language;
+import me.zero.twotakeonetool.lang.LanguageKey;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 
 public class JToolGuiComponent extends JComponent{
@@ -40,83 +42,83 @@ public class JToolGuiComponent extends JComponent{
 		this.add(bar);		
 	}
 	private void addSidebarEntries(JSideBar bar) throws IOException {		
-		bar.addEntry(new JSideBarEntry("Sprites",ImageIO.read(getClass().getResource("/ressources/images/image.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_SPRITES),ImageIO.read(getClass().getResource("/ressources/images/image.png")), bar, new Consumer<JSideBarEntry>() {
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.SPRITE));
-		bar.addEntry(new JSideBarEntry("Lua Scripts",ImageIO.read(getClass().getResource("/ressources/images/lua.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_LUA_SCRIPTS),ImageIO.read(getClass().getResource("/ressources/images/lua.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.SCRIPT));
-		bar.addEntry(new JSideBarEntry("SE Protections",ImageIO.read(getClass().getResource("/ressources/images/protection.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_SE_PROTECTIONS),ImageIO.read(getClass().getResource("/ressources/images/protection.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.PROTECTION));
-		bar.addEntry(new JSideBarEntry("Teleports",ImageIO.read(getClass().getResource("/ressources/images/map.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_TELEPORTS),ImageIO.read(getClass().getResource("/ressources/images/map.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.TELEPORT));
-		bar.addEntry(new JSideBarEntry("Stats",ImageIO.read(getClass().getResource("/ressources/images/stats.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_STATS),ImageIO.read(getClass().getResource("/ressources/images/stats.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.STAT));
-		bar.addEntry(new JSideBarEntry("Vehicle",ImageIO.read(getClass().getResource("/ressources/images/car.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_VEHICLES),ImageIO.read(getClass().getResource("/ressources/images/car.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.VEHICLE));
-		bar.addEntry(new JSideBarEntry("Outfits",ImageIO.read(getClass().getResource("/ressources/images/outfit.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_OUTFITS),ImageIO.read(getClass().getResource("/ressources/images/outfit.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.OUTFIT));
-		bar.addEntry(new JSideBarEntry("Objects",ImageIO.read(getClass().getResource("/ressources/images/object.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_OBJECTS),ImageIO.read(getClass().getResource("/ressources/images/object.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.OBJECT));
-		bar.addEntry(new JSideBarEntry("Animations",ImageIO.read(getClass().getResource("/ressources/images/animation.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_ANIMATIONS),ImageIO.read(getClass().getResource("/ressources/images/animation.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.ANIMATION));
-		bar.addEntry(new JSideBarEntry("Font",ImageIO.read(getClass().getResource("/ressources/images/font.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_FONTS),ImageIO.read(getClass().getResource("/ressources/images/font.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.FONT));
-		bar.addEntry(new JSideBarEntry("Language",ImageIO.read(getClass().getResource("/ressources/images/language.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_LANGUAGES),ImageIO.read(getClass().getResource("/ressources/images/language.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
 		}, SideBarEntryType.LANGUAGE));
-		bar.addEntry(new JSideBarEntry("Config",ImageIO.read(getClass().getResource("/ressources/images/config.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_CONFIGS),ImageIO.read(getClass().getResource("/ressources/images/config.png")), bar, new Consumer<JSideBarEntry>() {
 					
 					@Override
 					public void accept(JSideBarEntry t) {
@@ -124,7 +126,7 @@ public class JToolGuiComponent extends JComponent{
 					}
 				}, SideBarEntryType.CONFIG));
 		
-		bar.addEntry(new JSideBarEntry("Webpacks",ImageIO.read(getClass().getResource("/ressources/images/web.png")), bar, new Consumer<JSideBarEntry>() {
+		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_WEBPACKS),ImageIO.read(getClass().getResource("/ressources/images/web.png")), bar, new Consumer<JSideBarEntry>() {
 			
 			@Override
 			public void accept(JSideBarEntry t) {
