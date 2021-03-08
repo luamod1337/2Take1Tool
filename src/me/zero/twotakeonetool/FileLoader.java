@@ -347,14 +347,12 @@ public class FileLoader {
 	public static FileConfiguration loadLanguageStorage() {
 		if(lang == null) {
 			selectLanguage();
-			System.out.println("selected: " + selected_lang);
 			try {
 				File langConf = new File(TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\lang.yml");
 				if(!langConf.exists()) {
 					try {
 						langConf.createNewFile();
-						System.out.println("reading: " + "/ressources/files/lang_" + selected_lang  + ".yml");
-						BufferedReader reader = new BufferedReader(new InputStreamReader(TwoTakeOneToolGui.instance.getClass().getResourceAsStream("/ressources/files/lang_" + selected_lang + ".yml")));
+						BufferedReader reader = new BufferedReader(new InputStreamReader(new FileLoader().getClass().getResourceAsStream("/ressources/files/lang_" + selected_lang + ".yml")));
 						BufferedWriter writer = new BufferedWriter(new FileWriter(langConf));
 						String line;
 				        while ((line = reader.readLine()) != null) {

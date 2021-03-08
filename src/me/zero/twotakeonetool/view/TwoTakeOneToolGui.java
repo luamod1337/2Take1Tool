@@ -98,7 +98,7 @@ public class TwoTakeOneToolGui extends JFrame{
 
 								} catch (IOException e) {
 									e.printStackTrace();
-									JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.DOWNLOAD_ERROR).replace("<updateUrl>", updateUrl));
+									JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.DOWNLOAD_ERROR).replace("<updateUrl>", updateUrl).replace("<error>", e.getMessage()));
 								}
 							}
 						}

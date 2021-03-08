@@ -1,10 +1,7 @@
 package me.zero.twotakeonetool;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,12 +14,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -61,12 +53,12 @@ public class TwoTakeOneTool {
 	public static File languageFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\");
 	public static File fontFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\");
 
-	private static TwoTakeOneToolGui gui = new TwoTakeOneToolGui();
+	public static TwoTakeOneToolGui gui;
 	
 	public static void main(String[] args) {
 
-
 		installIfNeeded();
+		TwoTakeOneTool.gui = new TwoTakeOneToolGui();
 		gui.setBounds(0, 0, 1000, 800);
 		gui.setBackground(Color.WHITE);
 		gui.setVisible(true);

@@ -3,7 +3,7 @@ UPDATE_FOUND_TITLE: 'Mise à jour trouvée !'
 UPDATE_DOWNLOADED: 'Télécharger vers <path> successful'
 SUCCESSFULL: 'Succès'
 ERROR: 'Erreur'
-DOWNLOAD_ERROR: 'Erreur de téléchargement <updateUrl>'
+DOWNLOAD_ERROR: 'Erreur de téléchargement <updateUrl> <error> Veuillez commencer en tant qu'administrateur'
 UPDATE_CONFIGURATION_ERROR: 'Erreur : Aucune <updateUrl> ou <version> entrée trouvée !'
 ERROR_WEBPAGE: Erreur lors de l'appel de <updateUrl>.
 ERROR_MISSING_PACKFILE: 'Packfile <Packpath> non trouvé !'
