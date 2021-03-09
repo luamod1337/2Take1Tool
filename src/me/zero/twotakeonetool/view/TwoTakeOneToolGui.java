@@ -36,7 +36,7 @@ public class TwoTakeOneToolGui extends JFrame{
 	private static final long serialVersionUID = 1L;
 	public static TwoTakeOneToolGui instance;
 	public JToolGuiComponent gui;
-	private String version = "0.3";
+	private String version = "0.4";
 
 	private List<MouseListener> listener = Collections.synchronizedList(new ArrayList<MouseListener>());
 	private List<MouseWheelListener> listenerWheel = Collections.synchronizedList(new ArrayList<MouseWheelListener>());
