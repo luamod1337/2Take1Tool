@@ -154,7 +154,7 @@ public class JSideBar extends JComponent{
 		if(!entry.getType().equals(SideBarEntryType.WEB)) {
 			FileLoader.clearTempPack();
 		}
-		if(entry.getText().length() > 0 && !entry.equals(selectedEntry)) {
+		if(entry.getText().length() > 0) {
 			selectedEntry = entry;
 			parent.gui.pane.loadSelectedEntry(selectedEntry);
 		}

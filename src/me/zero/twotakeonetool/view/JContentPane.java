@@ -119,7 +119,6 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 	}
 
 	public void loadSelectedEntry(JSideBarEntry selectedEntry) {	
-		
 		for(String packName : packs.keySet()) {
 			TwoTakeOnePackView pack = packs.get(packName);
 			try {
@@ -152,8 +151,9 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 								}
 							});
 							int returnVal = chooser.showOpenDialog(null);
-							if(returnVal == JFileChooser.APPROVE_OPTION) {							
-									File f = new File(TwoTakeOneTool.getInstallFolderBySelectedEntry(bar.getSelectedEntry().getType()) + "\\" + chooser.getSelectedFile().getName());								
+							if(returnVal == JFileChooser.APPROVE_OPTION) {		
+								System.out.println(TwoTakeOneTool.getPackFolderBySelectedEntry(bar.getSelectedEntry().getType()) + "\\" + chooser.getSelectedFile().getName());
+									File f = new File(TwoTakeOneTool.getPackFolderBySelectedEntry(bar.getSelectedEntry().getType()) + "\\" + chooser.getSelectedFile().getName());								
 									try {
 										Files.move(chooser.getSelectedFile().toPath(), f.toPath());
 									} catch (IOException e) {

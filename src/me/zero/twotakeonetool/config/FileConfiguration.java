@@ -73,29 +73,33 @@ public class FileConfiguration {
 
 	@SuppressWarnings("unchecked")
 	private void loadData(String file) {
-		for (Object o : itr) {
-            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>)o;
-            if(o == null) {
-            	JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_LOADING).replace("<file>", file).replace("<object>", o.toString()));
-            }else {
-            	for(String keys : data.keySet()) {
-            		if( data.get(keys) == null) {
-                		//JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);
-                		JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_LOADING).replace("<file>", file).replace("<object>", o.toString()));
-                	}else {
-                		if(data.get(keys).getClass().equals(ArrayList.class)) {
-                    		lists.put(keys, (ArrayList<Object>) data.get(keys));
-                    	}else if(data.get(keys).getClass().equals(Double.class)){
-                    		listDouble.put(keys, Double.valueOf(data.get(keys).toString()));
-                    	}else if(data.get(keys).getClass().equals(String.class)){
-                    		listString.put(keys, data.get(keys).toString());
-                    	}else {
-                    		System.out.println("unprocessed type found " + data.get(keys).getClass());
-                    	}
-                	}
-                }
-            }
-        }
+		try {
+			for (Object o : itr) {
+	            LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>)o;
+	            if(o == null) {
+	            	JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_LOADING).replace("<file>", file).replace("<object>", o.toString()));
+	            }else {
+	            	for(String keys : data.keySet()) {
+	            		if( data.get(keys) == null) {
+	                		//JOptionPane.showMessageDialog(null, "Error loading '" + file + "' -> " + o);
+	                		JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_LOADING).replace("<file>", file).replace("<object>", o.toString()));
+	                	}else {
+	                		if(data.get(keys).getClass().equals(ArrayList.class)) {
+	                    		lists.put(keys, (ArrayList<Object>) data.get(keys));
+	                    	}else if(data.get(keys).getClass().equals(Double.class)){
+	                    		listDouble.put(keys, Double.valueOf(data.get(keys).toString()));
+	                    	}else if(data.get(keys).getClass().equals(String.class)){
+	                    		listString.put(keys, data.get(keys).toString());
+	                    	}else {
+	                    		System.out.println("unprocessed type found " + data.get(keys).getClass());
+	                    	}
+	                	}
+	                }
+	            }
+	        }
+		}catch(Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public ArrayList<Object> getList(String key){

@@ -71,6 +71,13 @@ public class Description {
 					e.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Couldn't find image '" + imagePath + "' inside pack!");
 				}				
+			}else if(o.getClass().equals(ArrayList.class)){
+				@SuppressWarnings("unchecked")
+				ArrayList<String> subdata = (ArrayList<String>)o;
+				for(String s : subdata) {
+					posTostrings.put(length++, s);
+					totalOffset+=60;
+				}			
 			}else {
 				System.out.println("unprocessed class: " + o.getClass());
 			}			
