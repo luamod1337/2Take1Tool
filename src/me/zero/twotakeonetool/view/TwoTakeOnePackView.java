@@ -5,6 +5,8 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -56,6 +58,8 @@ public class TwoTakeOnePackView extends JComponent{
 
 	private int page = 0;
 	public String updateUrl;
+	
+	private Image logo;
 
 	public TwoTakeOnePackView(FileConfiguration config,JSideBar bar,SideBarEntryType type) {
 		this.config = config;
@@ -238,15 +242,20 @@ public class TwoTakeOnePackView extends JComponent{
 
 		g2.drawString(name + " " + Language.getTranslatedString(LanguageKey.VERSION) + ": " + version, bar.getWidth()+10, y+30);
 		//Logo
-		try {
-			InputStream stream = config.loadImage(config.getString("Logo"));
-			if(stream != null) {
-				BufferedImage img = ImageIO.read(stream);
-				g2.drawImage(img, bar.getWidth()+30, y+40, 50, 50, null);
+		if(logo == null) {
+			try {
+				InputStream stream = config.loadImage(config.getString("Logo"));
+				if(stream != null) {
+					byte[] data;
+					data = new byte[stream.available()];
+					stream.read(data);
+					logo = Toolkit.getDefaultToolkit().createImage(data);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
+		g2.drawImage(logo, bar.getWidth()+30, y+40, 50, 50, null);
 		//Beschreibung
 		g2.setFont(new Font("Arial",Font.PLAIN,20));
 		desc.get(page).paint(g2);

@@ -3,6 +3,8 @@ package me.zero.twotakeonetool.util;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,12 +24,12 @@ import me.zero.twotakeonetool.view.TwoTakeOneToolGui;
 public class Description {
 
 	private HashMap<Integer, String> posTostrings = new HashMap<>();
-	private HashMap<Integer, BufferedImage> posToimages = new HashMap<>();
+	private HashMap<Integer, Image> posToimages = new HashMap<>();
 	private int length = 0;
 	private TwoTakeOnePackView pack;
 	private JSideBar bar;
 	
-	public Description(HashMap<Integer, String> posTostrings,HashMap<Integer, BufferedImage> posToimages,int length,TwoTakeOnePackView pack,JSideBar bar) {
+	public Description(HashMap<Integer, String> posTostrings,HashMap<Integer, Image> posToimages,int length,TwoTakeOnePackView pack,JSideBar bar) {
 		this.length = length;
 		this.posToimages = posToimages;
 		this.posTostrings = posTostrings;
@@ -41,7 +43,7 @@ public class Description {
 		ArrayList<Object> data = config.getList("Description");
 		int totalOffset = 0;
 		HashMap<Integer, String> posTostrings = new HashMap<>();
-		HashMap<Integer, BufferedImage> posToimages = new HashMap<>();
+		HashMap<Integer, Image> posToimages = new HashMap<>();
 		int length = 0;
 				
 		for(int i  = 0; i < data.size();i++) {
@@ -63,9 +65,13 @@ public class Description {
 				try {
 					InputStream stream = config.loadImage(imagePath);
 					if(stream != null) {
-						BufferedImage img = ImageIO.read(stream);		
+						//BufferedImage img = ImageIO.read(stream);		
+						byte[] byteData;
+						byteData = new byte[stream.available()];
+						stream.read(byteData);
+						Image img = Toolkit.getDefaultToolkit().createImage(byteData);
 						posToimages.put(length++, img);
-						totalOffset+=img.getHeight();
+						totalOffset+=img.getHeight(pack);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -107,14 +113,14 @@ public class Description {
 					g2.drawImage(posToimages.get(i), bar.getWidth()+ width, pack.getY()+154 + (i*20) + imageOffset, 480, 92, null);
 					imageOffset += 92;
 				}else if(pack.getType().equals(SideBarEntryType.VEHICLE) || pack.getType().equals(SideBarEntryType.OUTFIT) || pack.getType().equals(SideBarEntryType.FONT)){
-					double ratio = 250.0/posToimages.get(i).getHeight();
-					int newWidth = (int) (posToimages.get(i).getWidth()*ratio);
-					int newHeight = (int) (posToimages.get(i).getHeight()*ratio);
+					double ratio = 250.0/posToimages.get(i).getHeight(null);
+					int newWidth = (int) (posToimages.get(i).getWidth(null)*ratio);
+					int newHeight = (int) (posToimages.get(i).getHeight(null)*ratio);
 					g2.drawImage(posToimages.get(i), bar.getWidth()+ 100, pack.getY()+60 + (i*20) + imageOffset, newWidth, newHeight, null);
 					imageOffset += 92;
 				}else {
 					g2.drawImage(posToimages.get(i), bar.getWidth()+100, pack.getY()+60 + (i*20) + imageOffset, null);
-					imageOffset += posToimages.get(i).getHeight();
+					imageOffset += posToimages.get(i).getHeight(null);
 				}
 			}
 		}	
