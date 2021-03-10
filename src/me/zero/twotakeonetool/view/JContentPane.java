@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
@@ -23,6 +25,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.filechooser.FileFilter;
 
 import org.yaml.snakeyaml.Yaml;
@@ -52,6 +55,17 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 	public JContentPane(JSideBar bar) {
 		this.bar = bar;		
 		TwoTakeOneToolGui.instance.addMouseWheelListener(this);
+		
+		Timer timer = new Timer(40, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(TwoTakeOneToolGui.instance.gui != null) {
+					TwoTakeOneToolGui.instance.gui.repaint();
+				}
+			}
+		});
+		timer.start();
+		
 	}
 	
 	@Override
@@ -70,7 +84,7 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			for(String key : packKeys) {
 				TwoTakeOnePackView pack = packs.get(key);
 				pack.paint(g2,bar.getWidth()+2,tbar.getHeight()+2 + (cnt++*402)+offsetY);
-				pack.paint(g2);
+				//pack.paint(g2);
 			}
 		}catch(ConcurrentModificationException e) {
 			//Ignore it here, it will be drawn later again
@@ -105,6 +119,7 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 		if(!packs.containsKey((pack.config.getString("Name")+":" + pack.config.getString("Version")))) {
 			packKeys.add((pack.config.getString("Name")+":" + pack.config.getString("Version")));
 			this.packs.put((pack.config.getString("Name")+":" + pack.config.getString("Version")),pack);
+			this.add(pack);
 		}else {
 			//JOptionPane.showMessageDialog(null, "Duplicate Pack found '" + (pack.config.getString("Name")+":" + pack.config.getString("Version")) + "'");
 			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.DUPLICATE_PACK).replace("<name>", pack.config.getString("Name")).replace("<version>", pack.config.getString("Version")));
@@ -370,6 +385,7 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 				}
 				this.packKeys.add((pack.config.getString("Name")+":" + pack.config.getString("Version")));
 				this.packs.put(pack.getName()+":" + pack.getVersion(), pack);
+				this.add(pack);
 			}
 		}
 		TwoTakeOneToolGui.instance.gui.repaint();
@@ -381,6 +397,7 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 	public void addPack(TwoTakeOnePackView pack) {
 		this.packKeys.add((pack.config.getString("Name")+":" + pack.config.getString("Version")));
 		this.packs.put(pack.getName()+":" + pack.getVersion(), pack);
+		this.add(pack);
 	}
 	public void clear() {
 		this.packs.clear();

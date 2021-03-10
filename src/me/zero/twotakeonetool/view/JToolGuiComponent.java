@@ -30,7 +30,7 @@ public class JToolGuiComponent extends JComponent{
 		toolBar = new JToolToolBar(bar, pane);
 		pane.setToolBar(toolBar);
 		pane.setSideBar(bar);
-		
+		this.add(pane);
 		try {
 			addSidebarEntries(bar);
 		} catch (IOException e) {

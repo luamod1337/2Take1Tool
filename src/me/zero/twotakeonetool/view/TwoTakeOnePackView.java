@@ -223,11 +223,10 @@ public class TwoTakeOnePackView extends JComponent{
 		this.y = y;
 		this.paint(g);
 	}
-
+	
 	@Override
 	public void paint(Graphics g) {
-		super.paint(g);
-
+		//super.paint(g);
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setColor(new Color(46,48,62));
 		g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 400);
@@ -245,17 +244,18 @@ public class TwoTakeOnePackView extends JComponent{
 		if(logo == null) {
 			try {
 				InputStream stream = config.loadImage(config.getString("Logo"));
-				if(stream != null) {
+				BufferedInputStream bstream = new BufferedInputStream(stream);
+				if(logo == null) {
 					byte[] data;
-					data = new byte[stream.available()];
-					stream.read(data);
+					data = new byte[bstream.available()];
+					bstream.read(data);
 					logo = Toolkit.getDefaultToolkit().createImage(data);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		g2.drawImage(logo, bar.getWidth()+30, y+40, 50, 50, null);
+		g2.drawImage(logo, bar.getWidth()+30, y+40, 50, 50, this);
 		//Beschreibung
 		g2.setFont(new Font("Arial",Font.PLAIN,20));
 		desc.get(page).paint(g2);

@@ -69,9 +69,9 @@ public class Description {
 						byte[] byteData;
 						byteData = new byte[stream.available()];
 						stream.read(byteData);
-						Image img = Toolkit.getDefaultToolkit().createImage(byteData);
+						/*Image img = Toolkit.getDefaultToolkit().createImage(byteData);
 						posToimages.put(length++, img);
-						totalOffset+=img.getHeight(pack);
+						totalOffset+=img.getHeight(pack);*/
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
