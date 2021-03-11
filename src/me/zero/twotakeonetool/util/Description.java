@@ -64,14 +64,15 @@ public class Description {
 				String imagePath = (String) subdata.get("Image");
 				try {
 					InputStream stream = config.loadImage(imagePath);
+					System.out.println("load image " + imagePath);
 					if(stream != null) {
 						//BufferedImage img = ImageIO.read(stream);		
 						byte[] byteData;
 						byteData = new byte[stream.available()];
 						stream.read(byteData);
-						/*Image img = Toolkit.getDefaultToolkit().createImage(byteData);
+						Image img = Toolkit.getDefaultToolkit().createImage(byteData);
 						posToimages.put(length++, img);
-						totalOffset+=img.getHeight(pack);*/
+						totalOffset+=img.getHeight(pack);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

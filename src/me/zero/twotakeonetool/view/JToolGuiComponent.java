@@ -23,6 +23,7 @@ public class JToolGuiComponent extends JComponent{
 	private JToolToolBar toolBar;
 	
 	public JToolGuiComponent(TwoTakeOneToolGui gui) {
+		super();
 		this.gui = gui;
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		bar = new JSideBar(dim.height,gui);

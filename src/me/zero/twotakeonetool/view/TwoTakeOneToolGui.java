@@ -2,9 +2,6 @@ package me.zero.twotakeonetool.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
@@ -17,7 +14,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -25,11 +21,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 import org.yaml.snakeyaml.Yaml;
 
-import me.zero.twotakeonetool.FileLoader;
 import me.zero.twotakeonetool.TwoTakeOneTool;
 import me.zero.twotakeonetool.config.FileConfiguration;
 import me.zero.twotakeonetool.lang.Language;
@@ -46,6 +40,7 @@ public class TwoTakeOneToolGui extends JFrame{
 	private List<MouseWheelListener> listenerWheel = Collections.synchronizedList(new ArrayList<MouseWheelListener>());
 
 	public TwoTakeOneToolGui() {
+		super("2Take1Tool by 1337Zero");
 		TwoTakeOneToolGui.instance = this;
 		this.setTitle("2Take1Tool by 1337Zero");
 		this.setBackground(Color.WHITE);
@@ -63,6 +58,7 @@ public class TwoTakeOneToolGui extends JFrame{
 		}
 	}
 
+	
 	public void checkForUpdate() {
 		Thread t = new Thread(new Runnable() {
 			@Override

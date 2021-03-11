@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -255,7 +254,7 @@ public class TwoTakeOnePackView extends JComponent{
 				e.printStackTrace();
 			}
 		}
-		g2.drawImage(logo, bar.getWidth()+30, y+40, 50, 50, this);
+		g2.drawImage(logo, bar.getWidth()+30, y+40, 50, 50, TwoTakeOneToolGui.instance);
 		//Beschreibung
 		g2.setFont(new Font("Arial",Font.PLAIN,20));
 		desc.get(page).paint(g2);
