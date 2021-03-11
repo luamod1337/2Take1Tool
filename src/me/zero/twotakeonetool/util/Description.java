@@ -64,7 +64,6 @@ public class Description {
 				String imagePath = (String) subdata.get("Image");
 				try {
 					InputStream stream = config.loadImage(imagePath);
-					System.out.println("load image " + imagePath);
 					if(stream != null) {
 						//BufferedImage img = ImageIO.read(stream);		
 						byte[] byteData;
