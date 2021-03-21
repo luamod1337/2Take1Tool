@@ -70,6 +70,7 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 		try {
 			for(String key : packKeys) {
 				TwoTakeOnePackView pack = packs.get(key);
+				//System.out.println("render pack " + key);
 				pack.paint(g2,bar.getWidth()+2,tbar.getHeight()+2 + (cnt++*402)+offsetY);
 				//pack.paint(g2);
 			}
@@ -184,7 +185,9 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 			ArrayList<FileConfiguration> packs = FileLoader.loadModDirectory();
 			for(FileConfiguration config : packs) {
-				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
+				if(config != null) {
+					this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
+				}				
 			}
 			TwoTakeOneToolGui.instance.repaint();
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

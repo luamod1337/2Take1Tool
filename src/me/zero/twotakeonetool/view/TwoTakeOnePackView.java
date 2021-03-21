@@ -14,8 +14,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.function.Consumer;
+import java.util.function.LongBinaryOperator;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
@@ -40,7 +43,6 @@ public class TwoTakeOnePackView extends JComponent{
 	private int y;
 	private JSideBar bar;
 	private JSideBarEntry install;
-	//private JSideBarEntry deinstall;
 	private JSideBarEntry delete;
 	private JSideBarEntry updateCheck;
 
@@ -60,6 +62,11 @@ public class TwoTakeOnePackView extends JComponent{
 	
 	private Image logo;
 
+	private int red,green,blue = 0;
+	private boolean calc_red = true;
+	private boolean calc_green = false;
+	
+	
 	public TwoTakeOnePackView(FileConfiguration config,JSideBar bar,SideBarEntryType type) {
 		this.config = config;
 		this.bar = bar;
@@ -222,12 +229,51 @@ public class TwoTakeOnePackView extends JComponent{
 		this.y = y;
 		this.paint(g);
 	}
-	
+	private boolean isLeadTime() {
+		Calendar calendar = Calendar.getInstance();
+		return calendar.get(Calendar.HOUR_OF_DAY) == 13 && calendar.get(Calendar.MINUTE) == 37;
+	}
 	@Override
 	public void paint(Graphics g) {
 		//super.paint(g);
 		Graphics2D g2 = (Graphics2D)g;
-		g2.setColor(new Color(46,48,62));
+		//g2.setColor(new Color(46,48,62));
+		if(isLeadTime()) {
+			if(calc_red) {
+				red=red + 20;
+				if(red >= 255) {
+					red = 0;
+					calc_green = true;
+					calc_red = false;
+				}
+			}else if(calc_green) {
+				red=red + 20;
+				green=green+20;
+				if(green >= 255) {
+					red = 0;
+					green = 0;		
+					calc_green = false;
+					calc_red = false;	
+				}
+			}else {
+				red=red + 20;
+				green=green+20;
+				blue=blue+20;
+				if(blue >= 255) {
+					red = 0;
+					green = 0;		
+					blue = 0;
+					calc_red = true;
+					calc_green = false;
+				}
+			}
+		}else {
+			red = 41;
+			green = 44;
+			blue = 56;
+		}		
+		
+		g2.setColor(new Color(red,green,blue));
 		g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 400);
 
 		//g2.setColor(new Color(41,44,56));
@@ -239,22 +285,33 @@ public class TwoTakeOnePackView extends JComponent{
 		//Name
 
 		g2.drawString(name + " " + Language.getTranslatedString(LanguageKey.VERSION) + ": " + version, bar.getWidth()+10, y+30);
+		//Footer
+		//g2.setColor(new Color(26,27,33));
+		//g2.fillRect(x, y+350, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 50);
+		
 		//Logo
 		if(logo == null) {
+			String logopath = config.getString("Logo");	
 			try {
-				InputStream stream = config.loadImage(config.getString("Logo"));
-				BufferedInputStream bstream = new BufferedInputStream(stream);
-				if(logo == null) {
+				if(logopath != null) {
+					InputStream stream = config.loadImage(logopath);
+					BufferedInputStream bstream = new BufferedInputStream(stream);	
 					byte[] data;
 					data = new byte[bstream.available()];
 					bstream.read(data);
 					logo = Toolkit.getDefaultToolkit().createImage(data);
-				}
+				}			
 			} catch (IOException e) {
-				e.printStackTrace();
+				//System.out.println("error loading logo: " + e.getMessage() + " (Path: " + logopath + ",Pack: " + this.getName() + ")");
 			}
 		}
-		g2.drawImage(logo, bar.getWidth()+30, y+40, 50, 50, TwoTakeOneToolGui.instance);
+		if(logo != null) {
+			g2.drawImage(logo, bar.getWidth()+10, y+50, 80, 80, TwoTakeOneToolGui.instance);	
+			g2.setColor(Color.WHITE);
+			g2.drawRect(bar.getWidth()+9, y+49, 82, 82);
+			g2.setColor(new Color(126,86,194));
+		}
+		
 		//Beschreibung
 		g2.setFont(new Font("Arial",Font.PLAIN,20));
 		desc.get(page).paint(g2);
@@ -296,6 +353,15 @@ public class TwoTakeOnePackView extends JComponent{
 			g2.setColor(new Color(126,86,194));
 			updateCheck.paint(g2, TwoTakeOneToolGui.instance.getWidth()-200, y+380);
 		}
+		
+		//author
+		String author = config.getString("Author");
+		if(author != null) {
+			g2.drawString("Author:", bar.getWidth()+5, y+170);
+			g2.drawString(author, bar.getWidth()+5, y+195);
+		}	
+		
+		
 	}
 	@Override
 	public int getX() {

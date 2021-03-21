@@ -38,6 +38,8 @@ import javax.swing.SwingUtilities;
 import org.yaml.snakeyaml.Yaml;
 
 import me.zero.twotakeonetool.config.FileConfiguration;
+import me.zero.twotakeonetool.lang.Language;
+import me.zero.twotakeonetool.lang.LanguageKey;
 import me.zero.twotakeonetool.type.SideBarEntryType;
 import me.zero.twotakeonetool.view.JSideBar;
 import me.zero.twotakeonetool.view.TwoTakeOnePackView;
@@ -71,8 +73,7 @@ public class FileLoader {
 		        }
 		    }
 		} catch (ZipException e) {
-			e.printStackTrace();
-			System.out.println("while loading package " + file.getName());
+			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.PACK_ERROR).replace("<error>", e.getMessage()).replace("<name>", file.getName()),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("while loading package " + file.getName());
@@ -344,28 +345,33 @@ public class FileLoader {
 		}
 	}
 	
+	public static void installLang(String lang) {
+		File langConf = new File(TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\lang.yml");
+		
+			try {
+				langConf.createNewFile();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileLoader().getClass().getResourceAsStream("/ressources/files/lang_" + lang + ".yml")));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(langConf));
+				String line;
+		        while ((line = reader.readLine()) != null) {
+		            //resultStringBuilder.append(line).append("\n");
+		        	writer.write(line);
+		        	writer.newLine();
+		        }
+		        writer.close();
+		        reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}					
+		
+	}
+	
 	public static FileConfiguration loadLanguageStorage() {
+		File langConf = new File(TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\lang.yml");
 		if(lang == null) {
 			selectLanguage();
 			try {
-				File langConf = new File(TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\lang.yml");
-				if(!langConf.exists()) {
-					try {
-						langConf.createNewFile();
-						BufferedReader reader = new BufferedReader(new InputStreamReader(new FileLoader().getClass().getResourceAsStream("/ressources/files/lang_" + selected_lang + ".yml")));
-						BufferedWriter writer = new BufferedWriter(new FileWriter(langConf));
-						String line;
-				        while ((line = reader.readLine()) != null) {
-				            //resultStringBuilder.append(line).append("\n");
-				        	writer.write(line);
-				        	writer.newLine();
-				        }
-				        writer.close();
-				        reader.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}					
-				}
+				installLang(selected_lang);
 				lang = new FileConfiguration(new Yaml(),new FileInputStream(langConf), TwoTakeOneTool.settingsFolder.getAbsolutePath() + "\\data.yml");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -556,17 +562,20 @@ public class FileLoader {
 			if(packDir.isDirectory()) {
 				for(File pack : packDir.listFiles()) {
 					if(pack.getName().endsWith(".2take1pack")) {
-						TwoTakeOnePackView loadedPack = new TwoTakeOnePackView(FileLoader.loadModFile(pack, SideBarEntryType.LOAD), TwoTakeOneToolGui.instance.gui.getSideBar(), SideBarEntryType.LOAD);
-						if(loadedPack.getName().equals(name) && loadedPack.getVersion().equals(version)) {
-							return loadedPack;
-						}else {
-							try {
-								loadedPack.close();
-								loadedPack = null;
-							} catch (IOException e) {
-								e.printStackTrace();
+						FileConfiguration config = FileLoader.loadModFile(pack, SideBarEntryType.LOAD);
+						if(config != null) {
+							TwoTakeOnePackView loadedPack = new TwoTakeOnePackView(config, TwoTakeOneToolGui.instance.gui.getSideBar(), SideBarEntryType.LOAD);
+							if(loadedPack.getName().equals(name) && loadedPack.getVersion().equals(version)) {
+								return loadedPack;
+							}else {
+								try {
+									loadedPack.close();
+									loadedPack = null;
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
 							}
-						}
+						}						
 					}
 				}
 			}

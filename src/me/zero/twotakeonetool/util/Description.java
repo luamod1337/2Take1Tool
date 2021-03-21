@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class Description {
 		int length = 0;
 				
 		for(int i  = 0; i < data.size();i++) {
-			if(totalOffset > 500) {
+			if(totalOffset > 300) {
 				desc.add(new Description(posTostrings, posToimages, length, pack, bar));
 				posTostrings = new HashMap<>();
 				posToimages = new HashMap<>();
@@ -64,19 +65,20 @@ public class Description {
 				String imagePath = (String) subdata.get("Image");
 				try {
 					InputStream stream = config.loadImage(imagePath);
-					if(stream != null) {
+					BufferedInputStream bstream = new BufferedInputStream(stream);
+					if(bstream != null) {
 						//BufferedImage img = ImageIO.read(stream);		
 						byte[] byteData;
-						byteData = new byte[stream.available()];
-						stream.read(byteData);
+						byteData = new byte[bstream.available()];
+						bstream.read(byteData);
 						Image img = Toolkit.getDefaultToolkit().createImage(byteData);
 						posToimages.put(length++, img);
-						totalOffset+=img.getHeight(pack);
+						BufferedImage img_size = ImageIO.read(config.loadImage(imagePath));
+						totalOffset+=img_size.getHeight();
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Couldn't find image '" + imagePath + "' inside pack!");
-				}				
+				}  catch (IOException e) {
+					//System.out.println("error loading logo: " + e.getMessage());
+				}
 			}else if(o.getClass().equals(ArrayList.class)){
 				@SuppressWarnings("unchecked")
 				ArrayList<String> subdata = (ArrayList<String>)o;
@@ -103,23 +105,28 @@ public class Description {
 		for(int i  = 0; i < length;i++) {			
 			if(posTostrings.containsKey(i)) {
 				//draw String
-				g2.drawString(posTostrings.get(i), bar.getWidth()+100, pack.getY()+60 + (i*20) + imageOffset);
+				g2.drawString(posTostrings.get(i), bar.getWidth()+150, pack.getY()+60 + (i*20) + imageOffset);
 			}else {
 				//draw Image	
 				if(pack.getType().equals(SideBarEntryType.SPRITE)) {					
 					int width = (TwoTakeOneToolGui.instance.getWidth() - bar.getWidth() - 480)/2;
 					g2.setColor(Color.WHITE);
 					g2.drawRect(bar.getWidth()+ width-5, pack.getY()+154 + (i*20) + imageOffset - 5, 485, 97);
-					g2.drawImage(posToimages.get(i), bar.getWidth()+ width, pack.getY()+154 + (i*20) + imageOffset, 480, 92, null);
+					g2.drawImage(posToimages.get(i), bar.getWidth()+ width, pack.getY()+154 + (i*20) + imageOffset, 480, 92, TwoTakeOneToolGui.instance);
 					imageOffset += 92;
 				}else if(pack.getType().equals(SideBarEntryType.VEHICLE) || pack.getType().equals(SideBarEntryType.OUTFIT) || pack.getType().equals(SideBarEntryType.FONT)){
-					double ratio = 250.0/posToimages.get(i).getHeight(null);
+					//double ratio = 250.0/posToimages.get(i).getHeight(null);
+					double ratio = 280.0/posToimages.get(i).getHeight(null);
 					int newWidth = (int) (posToimages.get(i).getWidth(null)*ratio);
 					int newHeight = (int) (posToimages.get(i).getHeight(null)*ratio);
-					g2.drawImage(posToimages.get(i), bar.getWidth()+ 100, pack.getY()+60 + (i*20) + imageOffset, newWidth, newHeight, null);
+					g2.drawImage(posToimages.get(i), bar.getWidth()+ 120, pack.getY()+60 + (i*20) + imageOffset, newWidth, newHeight, TwoTakeOneToolGui.instance);
+					g2.setColor(Color.WHITE);
+					g2.drawRect(bar.getWidth()+ 118, pack.getY()+58 + (i*20) + imageOffset, newWidth+3, newHeight+3);					
 					imageOffset += 92;
 				}else {
-					g2.drawImage(posToimages.get(i), bar.getWidth()+100, pack.getY()+60 + (i*20) + imageOffset, null);
+					g2.drawImage(posToimages.get(i), bar.getWidth()+150, pack.getY()+60 + (i*20) + imageOffset, TwoTakeOneToolGui.instance);
+					g2.setColor(Color.WHITE);
+					g2.drawRect(bar.getWidth()+148, pack.getY()+58 + (i*20) + imageOffset,posToimages.get(i).getWidth(null)+3,posToimages.get(i).getHeight(null)+3);
 					imageOffset += posToimages.get(i).getHeight(null);
 				}
 			}

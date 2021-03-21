@@ -7,7 +7,12 @@ public class Language {
 
 	public static String getTranslatedString(LanguageKey key) {		
 		FileConfiguration lang = FileLoader.loadLanguageStorage();
-		return lang.getSettings().get(key.name()).toString();
+		String translated = lang.getSettings().get(key.name()).toString();
+		if(translated == null) {
+			//error, config old!
+			System.out.println("error, config outdated");
+		}
+		return translated;
 	}
 	
 }
