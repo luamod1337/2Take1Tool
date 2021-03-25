@@ -37,3 +37,5 @@ WEBPACK_INSTALLED: '<name> Version : <version> installée, vous pouvez la trouve
 REQUIRED_RESTART_TITLE: '2Take1Tool restart ?'
 REQUIRED_RESTART: '2Take1Tool doit être redémarré pour mettre à jour, redémarrer maintenant ?'
 PACK_ERROR: 'Erreur de chargement du Pack <name>, <error>'
+SELECT_PACK_TYP: 'Veuillez choisir un type de paquet'
+QUESTION_INSTALL_PACK: 'Faut-il installer <pack> ?'
