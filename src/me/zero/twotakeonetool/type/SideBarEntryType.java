@@ -24,6 +24,7 @@ public enum SideBarEntryType {
 	DEINSTALL,
 	FORWARD,
 	BACKWARD, 
-	WEB
+	WEB,
+	UI
 	;	
 }

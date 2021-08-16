@@ -274,11 +274,18 @@ public class TwoTakeOnePackView extends JComponent{
 		}		
 		
 		g2.setColor(new Color(red,green,blue));
+		//g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 400);
+		
 		g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 400);
 
 		//g2.setColor(new Color(41,44,56));
 		g2.setColor(new Color(26,27,33));
-		g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 40);
+		//System.out.println("drawing: " + this.getType().name());
+		if(this.getType().equals(SideBarEntryType.UI)) {
+			g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 703);
+		}else {
+			g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 40);
+		}		
 
 		g2.setColor(new Color(126,86,194));
 		g2.setFont(new Font("Open Sans, Lucida Sans", Font.PLAIN, 30));
@@ -332,7 +339,6 @@ public class TwoTakeOnePackView extends JComponent{
 			this.backward.paint(g2, -200, -200);
 		}
 		if(install.getType().equals(SideBarEntryType.INSTALL)) {
-
 			g2.setColor(new Color(41,44,56));
 			g2.drawRect(TwoTakeOneToolGui.instance.getWidth()-305, y+355, install.getWidth(), install.getHeight() + 10);
 			g2.setColor(new Color(126,86,194));
@@ -356,6 +362,7 @@ public class TwoTakeOnePackView extends JComponent{
 		
 		//author
 		String author = config.getString("Author");
+		g2.setColor(Color.white);
 		if(author != null) {
 			g2.drawString("Author:", bar.getWidth()+5, y+170);
 			g2.drawString(author, bar.getWidth()+5, y+195);

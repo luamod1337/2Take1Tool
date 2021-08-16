@@ -2,10 +2,12 @@ package me.zero.twotakeonetool.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
@@ -160,9 +162,10 @@ public class FileConfiguration {
 	        		throw new IOException("Failed to create directory " + newFile);
 	        	}
 	        } else if((CopyFiles != null && isInList(zipEntry.getName(), CopyFiles)) || (copyFolder != null && isInList(zipEntry.getName(), copyFolder))){
-	        	// fix for Windows-created archives
-	            File parent = newFile.getParentFile();
-	            if (!parent.isDirectory() && !parent.mkdirs()) {
+	        	// fix for Windows-created archives	            
+	        	File parent = newFile.getParentFile();
+	        	System.out.println();
+	            if (parent.isDirectory() && !parent.exists() && !parent.mkdirs()) {
 	            	zis.close();
 	            	throw new IOException("Failed to create directory " + parent);
 	            }
@@ -173,11 +176,66 @@ public class FileConfiguration {
 	            	fos.write(buffer, 0, len);
 	            }
 	            fos.close();
+	            
+	            if(zipEntry.getName().endsWith(".zip")) {	            	
+	            	installZipFile(newFile);
+	            }else {
+	            	System.out.println("cant process filetyp: " + zipEntry.getName());
+	            }
 	        }
 	        zipEntry = zis.getNextEntry();
 	    }
 	    zis.close();
 	}
+	
+	public void installZipFile(File folder) throws IOException {
+		System.out.println("install: " + folder.getPath());
+		ArrayList<Object> copyFolder = getList("CopyFolder");
+		ArrayList<Object> CopyFiles = getList("CopyFiles");
+		
+		ZipInputStream zis = new ZipInputStream(new FileInputStream(folder),Charset.forName("UTF-8"));
+        ZipEntry zipEntry = zis.getNextEntry();
+        byte[] buffer = new byte[1024];
+	    while (zipEntry != null) {
+	    	File newFile = new File(folder.getAbsolutePath() + "\\" + zipEntry.getName());
+	        if (copyFolder != null && zipEntry.isDirectory() && isInList(zipEntry.getName(), copyFolder)) {
+	        	if (!newFile.isDirectory() && !newFile.mkdirs()) {
+	            	zis.close();
+	        		throw new IOException("Failed to create directory " + newFile);
+	        	}
+	        	System.out.println("create folder " + newFile);
+	        } else{
+	        	// fix for Windows-created archives	            
+	        	/*File parent = newFile.getParentFile();
+	        	System.out.println();
+	            if (parent.isDirectory() && !parent.exists() && !parent.mkdirs()) {
+	            	zis.close();
+	            	throw new IOException("Failed to create directory " + parent);
+	            }
+	            // write file content
+	            FileOutputStream fos = new FileOutputStream(newFile);
+	            int len;
+	            while ((len = zis.read(buffer)) > 0) {
+	            	fos.write(buffer, 0, len);
+	            }
+	            fos.close();
+	            */
+	            if(zipEntry.getName().endsWith(".zip")) {	            	
+	            	//System.out.println("process filetyp: " + zipEntry.getName());
+	            }else if(zipEntry.getName().endsWith(".dds")){
+	            	System.out.println("found dds file " + zipEntry.getName());
+	            }else if(zipEntry.getName().endsWith(".ini")){
+	            	System.out.println("found ini file " + zipEntry.getName());
+	            }else {
+	            	//System.out.println("cant process filetyp: " + zipEntry.getName());
+	            }
+	        }
+	        zipEntry = zis.getNextEntry();
+	    }
+	    zis.close();
+		
+	}
+	
 	public void deinstall(TwoTakeOnePackView pack) throws IOException {
 		ArrayList<Object> copyFolder = getList("CopyFolder");
 		ArrayList<Object> CopyFiles = getList("CopyFiles");

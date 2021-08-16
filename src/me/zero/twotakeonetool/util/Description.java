@@ -114,6 +114,12 @@ public class Description {
 					g2.drawRect(bar.getWidth()+ width-5, pack.getY()+154 + (i*20) + imageOffset - 5, 485, 97);
 					g2.drawImage(posToimages.get(i), bar.getWidth()+ width, pack.getY()+154 + (i*20) + imageOffset, 480, 92, TwoTakeOneToolGui.instance);
 					imageOffset += 92;
+				}else if(pack.getType().equals(SideBarEntryType.UI)) {					
+					int height = 600;
+					g2.setColor(Color.WHITE);
+					g2.drawRect(bar.getWidth()+145, pack.getY()+60 + (i*20) + imageOffset - 5, 485+5, height + 10);
+					g2.drawImage(posToimages.get(i), bar.getWidth()+150, pack.getY()+60 + (i*20) + imageOffset, 480, height, TwoTakeOneToolGui.instance);
+					imageOffset += 92;
 				}else if(pack.getType().equals(SideBarEntryType.VEHICLE) || pack.getType().equals(SideBarEntryType.OUTFIT) || pack.getType().equals(SideBarEntryType.FONT)){
 					//double ratio = 250.0/posToimages.get(i).getHeight(null);
 					double ratio = 280.0/posToimages.get(i).getHeight(null);

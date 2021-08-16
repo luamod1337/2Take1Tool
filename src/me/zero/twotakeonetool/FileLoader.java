@@ -106,6 +106,21 @@ public class FileLoader {
 		}
 		return files;
 	}
+	public static ArrayList<FileConfiguration> loadUIDirectory() {
+		ArrayList<FileConfiguration> files = new ArrayList<>();
+		String[] sFiles = TwoTakeOneTool.uiFolder.list();
+		int cnt = 0;
+		for(String sFile : sFiles) {
+			if(cnt > startAmount) {
+				return files;
+			}
+			if(sFile.endsWith(".2take1pack")) {
+				files.add(loadModFile(new File(TwoTakeOneTool.uiFolder.getAbsoluteFile() + "\\" + sFile),  SideBarEntryType.UI));
+				cnt++;
+			}
+		}
+		return files;
+	}
 	public static ArrayList<FileConfiguration> loadProtectionDirectory(){
 		ArrayList<FileConfiguration> files = new ArrayList<>();
 		String[] sFiles = TwoTakeOneTool.protectionFolder.list();
@@ -583,4 +598,6 @@ public class FileLoader {
 		System.gc();
 		return null;
 	}
+
+	
 }

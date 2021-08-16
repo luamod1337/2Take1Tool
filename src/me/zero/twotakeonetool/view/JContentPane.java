@@ -67,11 +67,15 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 		
 		//
 		int cnt = 0;
+		int packHeight = 402;
 		try {
 			for(String key : packKeys) {
 				TwoTakeOnePackView pack = packs.get(key);
 				//System.out.println("render pack " + key);
-				pack.paint(g2,bar.getWidth()+2,tbar.getHeight()+2 + (cnt++*402)+offsetY);
+				if(pack.getType().equals(SideBarEntryType.UI)) {
+					packHeight = 703;
+				}				
+				pack.paint(g2,bar.getWidth()+2,tbar.getHeight()+2 + (cnt++*packHeight)+offsetY);
 				//pack.paint(g2);
 			}
 		}catch(ConcurrentModificationException e) {
@@ -79,19 +83,20 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 		}		
 		if(bar.getSelectedEntry() == null && packs.size() == 0) {
 			g2.setColor(new Color(46,48,62));
-			//System.out.println("paint-selected: " + bar.getSelectedEntry().getName());
 			Font font = new Font("Open Sans, Lucida Sans", Font.PLAIN, 20);
 			g2.setFont(font);
 			g2.drawString("Welcome to 2Take1Tool by 1337Zero", ((TwoTakeOneToolGui.instance.getWidth()-bar.getWidth())/2)-10, tbar.getHeight()+20);
-
 			g2.drawString("Disclaimer: This tool has no relation to 2Take1Menu, nor is it needed to run 2Take1Menu!", bar.getWidth() + 50, tbar.getHeight()+100);
-			g2.drawString("if you encounter Problems, please tell @1337Zero in discord about it either than asking in support!", bar.getWidth() + 50, tbar.getHeight()+130);
-			
+			g2.drawString("if you encounter Problems, please tell @1337Zero in discord about it either than asking in support!", bar.getWidth() + 50, tbar.getHeight()+130);			
 			g2.drawString("This tool can only process files of \"2take1pack\"",bar.getWidth() + 50, tbar.getHeight()+150);
 			g2.drawString("This is basicly a renamed zip file with a \"install.yml\" inside",bar.getWidth() + 50, tbar.getHeight()+170);
+		}else if(bar.getSelectedEntry().getType().equals(SideBarEntryType.WEB) && packs.size() == 0){
+			g2.setColor(new Color(46,48,62));
+			Font font = new Font("Open Sans, Lucida Sans", Font.PLAIN, 20);
+			g2.setFont(font);
+			g2.drawString("Welcome to the Web File Selector", ((TwoTakeOneToolGui.instance.getWidth()-bar.getWidth())/2)-10, tbar.getHeight()+20);			
+			g2.drawString("Please select a type by click the matching image on the toolbar!", bar.getWidth() + 50, tbar.getHeight()+100);			
 		}
-		
-		
 	}
 	
 	@Override
@@ -195,6 +200,15 @@ public class JContentPane extends JComponent implements MouseWheelListener{
 			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
 			ArrayList<FileConfiguration> packs = FileLoader.loadSpriteDirectory();
+			for(FileConfiguration config : packs) {
+				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
+			}
+			TwoTakeOneToolGui.instance.repaint();
+			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}else if(selectedEntry.getType().equals(SideBarEntryType.UI)) {
+			TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		
+			ArrayList<FileConfiguration> packs = FileLoader.loadUIDirectory();
 			for(FileConfiguration config : packs) {
 				this.addTwoTakeOnePackView(new TwoTakeOnePackView(config, bar,selectedEntry.getType()));
 			}

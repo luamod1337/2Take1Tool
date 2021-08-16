@@ -30,6 +30,7 @@ public class TwoTakeOneTool {
 
 	public static File mainFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool");
 	public static File spriteFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\sprite");
+	public static File uiFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\ui");
 	public static File scriptFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\script");
 	public static File protectionFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\protection");
 	public static File teleportFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\teleport");
@@ -46,7 +47,8 @@ public class TwoTakeOneTool {
 	public static File settingsFolder = new File(System.getenv("APPDATA") + "\\2Take1Tool\\settings");
 
 	public static File scriptFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\scripts\\");
-	public static File spriteFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\sprites\\");
+	public static File spriteFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\ui\\headers\\");
+	public static File uiFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\ui\\");
 	public static File cfgFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\cfg\\");
 	public static File outfitFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\moddedOutfits\\");
 	public static File vehicleFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\moddedVehicles\\");
@@ -178,6 +180,9 @@ public class TwoTakeOneTool {
 
 			JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.INSTALLED));
 		}
+		if(!uiFolder.exists()) {
+			uiFolder.mkdir();
+		}
 	}
 
 	public static File getInstallFolderBySelectedEntry(SideBarEntryType type) {
@@ -185,6 +190,8 @@ public class TwoTakeOneTool {
 			return spriteFolderMod;
 		}else if(type.equals(SideBarEntryType.SCRIPT)) {
 			return scriptFolderMod;
+		}else if(type.equals(SideBarEntryType.UI)) {
+			return uiFolderMod;
 		}else if(type.equals(SideBarEntryType.VEHICLE)) {
 			return vehicleFolderMod;
 		}else if(type.equals(SideBarEntryType.LANGUAGE) || type.equals(SideBarEntryType.CONFIG)) {
@@ -209,6 +216,8 @@ public class TwoTakeOneTool {
 			return spriteFolder;
 		}else if(type.equals(SideBarEntryType.SCRIPT)) {
 			return scriptFolder;
+		}else if(type.equals(SideBarEntryType.UI)) {
+			return uiFolder;
 		}else if(type.equals(SideBarEntryType.VEHICLE)) {
 			return vehicleFolder;
 		}else if(type.equals(SideBarEntryType.LANGUAGE)) {
@@ -239,7 +248,7 @@ public class TwoTakeOneTool {
 	}
 
 	public static String getIconUrlBySidebarEntry(SideBarEntryType type) {
-		if(type.equals(SideBarEntryType.SPRITE)) {
+		if(type.equals(SideBarEntryType.SPRITE) || type.equals(SideBarEntryType.UI)) {
 			return "/ressources/images/image.png";
 		}else if(type.equals(SideBarEntryType.SCRIPT)) {
 			return "/ressources/images/lua.png";
