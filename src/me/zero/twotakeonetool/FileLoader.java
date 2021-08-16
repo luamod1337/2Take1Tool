@@ -55,7 +55,7 @@ public class FileLoader {
 
 	private static Thread loadWebPack;
 
-	private static String selected_lang = "english";
+	private static String selected_lang = "English";
 	
 	public static FileConfiguration loadModFile(File file,SideBarEntryType type) {
 		ZipFile zipFile;

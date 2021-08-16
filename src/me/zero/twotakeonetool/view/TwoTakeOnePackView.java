@@ -50,6 +50,7 @@ public class TwoTakeOnePackView extends JComponent{
 	private JSideBarEntry backward;
 	private String name;
 	private String version;
+	private String packType;
 
 	public boolean isWebPack = false;
 	private SideBarEntryType type;
@@ -73,6 +74,7 @@ public class TwoTakeOnePackView extends JComponent{
 		this.type = type;
 		name = config.getString("Name");
 		version = config.getString("Version");
+		packType = config.getString("Typ");
 		try {
 			install = new JSideBarEntry(Language.getTranslatedString(LanguageKey.INSTALL),ImageIO.read(getClass().getResource("/ressources/images/install.png")), bar, new Consumer<JSideBarEntry>() {
 				@Override
@@ -484,5 +486,9 @@ public class TwoTakeOnePackView extends JComponent{
 
 	public JSideBarEntry getUpdateCheck() {
 		return updateCheck;
+	}
+
+	public String loadPackType() {		
+		return packType;
 	}
 }

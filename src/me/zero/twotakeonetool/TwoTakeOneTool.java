@@ -1,7 +1,10 @@
 package me.zero.twotakeonetool;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,7 +17,12 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -150,8 +158,71 @@ public class TwoTakeOneTool {
 				JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.FILE_ERROR),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 			}
 		}
+		
+		
+		if(args.length > 0) {
+			String path = args[0];
+			File f = new File(args[0]);
+			if(f.exists()) {
+				TwoTakeOnePackView pack = new TwoTakeOnePackView(FileLoader.loadModFile(new File(path), SideBarEntryType.LOAD), TwoTakeOneToolGui.instance.gui.getSideBar(), SideBarEntryType.LOAD);
+				
+				String type = pack.loadPackType();
+				try {
+					pack.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				if(type == null) {
+					JDialog dialog = new JDialog();
+					JPanel panel = new JPanel(new BorderLayout());
+					JLabel label = new JLabel(Language.getTranslatedString(LanguageKey.SELECT_PACK_TYP));
+					JComboBox<String> box = new JComboBox<>();
+					
+					for(SideBarEntryType typ : SideBarEntryType.values()) {
+						box.addItem(typ.name());
+					}
+					JButton button = new JButton("Select");
+					button.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							loadPackWithType(box.getSelectedItem().toString(), f);
+							dialog.dispose();
+						}
+					});
+					panel.add(label,BorderLayout.NORTH);
+					panel.add(box,BorderLayout.CENTER);
+					panel.add(button,BorderLayout.SOUTH);
+					
+					dialog.add(panel);
+					dialog.setLocationRelativeTo(null);
+					dialog.pack();
+					dialog.setModal(true);
+					dialog.setVisible(true);					
+				}else {
+					loadPackWithType(type, f);
+				}	
+			}else {
+				JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_MISSING_PACKFILE).replace("<Packpath>", path),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
+			}
+		}	
 	}
 
+	private static void loadPackWithType(String type,File file) {
+		//File verschieben			
+		SideBarEntryType packTyp = SideBarEntryType.valueOf(type.toUpperCase());
+		File movedPack = new File(getInstallFolderBySelectedEntry(packTyp).getAbsolutePath() + "\\" + file.getName());
+		try {
+			Files.move(file.toPath(), movedPack.toPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage(),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
+		}	
+		TwoTakeOnePackView pack = new TwoTakeOnePackView(FileLoader.loadModFile(movedPack, packTyp), TwoTakeOneToolGui.instance.gui.getSideBar(), packTyp);
+		int choose = JOptionPane.showConfirmDialog(null, Language.getTranslatedString(LanguageKey.QUESTION_INSTALL_PACK).replace("<pack>", pack.getName()),Language.getTranslatedString(LanguageKey.QUESTION_INSTALL_PACK),JOptionPane.YES_NO_OPTION);
+		if(choose == JOptionPane.OK_OPTION) {
+			pack.install();
+		}
+	}
 	private static void installIfNeeded() {		
 		if(!mainFolder.exists()) {
 			//installieren
