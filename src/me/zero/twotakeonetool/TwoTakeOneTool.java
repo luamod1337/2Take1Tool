@@ -61,7 +61,8 @@ public class TwoTakeOneTool {
 	public static File outfitFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\moddedOutfits\\");
 	public static File vehicleFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\moddedVehicles\\");
 	public static File languageFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\");
-	public static File fontFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\");
+	public static File fontFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\ui\\fonts\\");
+	public static File profileModFolder = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\profiles\\");
 
 	public static TwoTakeOneToolGui gui;
 	

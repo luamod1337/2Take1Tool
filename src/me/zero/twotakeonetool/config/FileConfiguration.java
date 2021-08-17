@@ -1,9 +1,12 @@
 package me.zero.twotakeonetool.config;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +28,7 @@ import org.yaml.snakeyaml.Yaml;
 import me.zero.twotakeonetool.TwoTakeOneTool;
 import me.zero.twotakeonetool.lang.Language;
 import me.zero.twotakeonetool.lang.LanguageKey;
+import me.zero.twotakeonetool.util.PackHelper;
 import me.zero.twotakeonetool.view.TwoTakeOnePackView;
 
 public class FileConfiguration {
@@ -181,6 +185,7 @@ public class FileConfiguration {
 	            	installZipFile(newFile);
 	            }else {
 	            	System.out.println("cant process filetyp: " + zipEntry.getName());
+	            	JOptionPane.showMessageDialog(null, "Cant process Filetyp " + zipEntry.getName(),"Error",JOptionPane.ERROR_MESSAGE);
 	            }
 	        }
 	        zipEntry = zis.getNextEntry();
@@ -188,52 +193,113 @@ public class FileConfiguration {
 	    zis.close();
 	}
 	
-	public void installZipFile(File folder) throws IOException {
+	public void installZipFile(File folder)  {
 		System.out.println("install: " + folder.getPath());
 		ArrayList<Object> copyFolder = getList("CopyFolder");
-		ArrayList<Object> CopyFiles = getList("CopyFiles");
-		
-		ZipInputStream zis = new ZipInputStream(new FileInputStream(folder),Charset.forName("UTF-8"));
-        ZipEntry zipEntry = zis.getNextEntry();
-        byte[] buffer = new byte[1024];
-	    while (zipEntry != null) {
-	    	File newFile = new File(folder.getAbsolutePath() + "\\" + zipEntry.getName());
-	        if (copyFolder != null && zipEntry.isDirectory() && isInList(zipEntry.getName(), copyFolder)) {
-	        	if (!newFile.isDirectory() && !newFile.mkdirs()) {
-	            	zis.close();
-	        		throw new IOException("Failed to create directory " + newFile);
-	        	}
-	        	System.out.println("create folder " + newFile);
-	        } else{
-	        	// fix for Windows-created archives	            
-	        	/*File parent = newFile.getParentFile();
-	        	System.out.println();
-	            if (parent.isDirectory() && !parent.exists() && !parent.mkdirs()) {
-	            	zis.close();
-	            	throw new IOException("Failed to create directory " + parent);
-	            }
-	            // write file content
-	            FileOutputStream fos = new FileOutputStream(newFile);
-	            int len;
-	            while ((len = zis.read(buffer)) > 0) {
-	            	fos.write(buffer, 0, len);
-	            }
-	            fos.close();
-	            */
-	            if(zipEntry.getName().endsWith(".zip")) {	            	
-	            	//System.out.println("process filetyp: " + zipEntry.getName());
-	            }else if(zipEntry.getName().endsWith(".dds")){
-	            	System.out.println("found dds file " + zipEntry.getName());
-	            }else if(zipEntry.getName().endsWith(".ini")){
-	            	System.out.println("found ini file " + zipEntry.getName());
-	            }else {
-	            	//System.out.println("cant process filetyp: " + zipEntry.getName());
-	            }
-	        }
-	        zipEntry = zis.getNextEntry();
-	    }
-	    zis.close();
-		
+		//ArrayList<Object> CopyFiles = getList("CopyFiles");
+		try {
+			ZipInputStream zis = new ZipInputStream(new FileInputStream(folder),Charset.forName("UTF-8"));
+	        ZipEntry zipEntry = zis.getNextEntry();
+	        byte[] buffer = new byte[1024];
+		    while (zipEntry != null) {
+		    	File newFile = new File(folder.getAbsolutePath() + "\\" + zipEntry.getName());
+		        if (copyFolder != null && zipEntry.isDirectory() && isInList(zipEntry.getName(), copyFolder)) {
+		        	if (!newFile.isDirectory() && !newFile.mkdirs()) {
+		            	zis.close();
+		        		//throw new IOException("Failed to create directory " + newFile);
+		        	}
+		        	System.out.println("create folder " + newFile);
+		        } else{	        	
+		            if(zipEntry.getName().endsWith(".zip")) {	            	
+		            	//System.out.println("process filetyp: " + zipEntry.getName());
+		            }else if(zipEntry.getName().endsWith(".dds")){
+		            	File dds = new File(TwoTakeOneTool.spriteFolderMod + File.separator + PackHelper.createOldFileName(this.listString.getOrDefault("Name", "Error")).replace(".zip", "").replace(".rar", "") + ".dds");	
+		            	if(dds.exists()) {		
+				            int awnser = JOptionPane.showConfirmDialog(null, "There is allready a dds file, override ?","Warning",JOptionPane.YES_NO_OPTION);				            
+				            if(awnser == JOptionPane.YES_OPTION) {
+				            	FileOutputStream fos = new FileOutputStream(dds);
+					            int len;
+					            while ((len = zis.read(buffer)) > 0) {
+					            	fos.write(buffer, 0, len);
+					            }
+					            fos.close();					            
+				            }else {
+				            	System.out.println("dds.ini skipped!");
+				            }
+		            	}else {
+		            		FileOutputStream fos = new FileOutputStream(dds);
+				            int len;
+				            while ((len = zis.read(buffer)) > 0) {
+				            	fos.write(buffer, 0, len);
+				            }
+				            fos.close();	
+		            	}
+		            }else if(zipEntry.getName().contains("lang.ini")){
+		            	File lang = new File(TwoTakeOneTool.languageFolderMod + File.separator + "lang.ini");	
+		            	if(lang.exists()) {		
+				            int awnser = JOptionPane.showConfirmDialog(null, "There is allready an language file, override ?","Warning",JOptionPane.YES_NO_OPTION);				            
+				            if(awnser == JOptionPane.YES_OPTION) {
+				            	FileOutputStream fos = new FileOutputStream(lang);
+					            int len;
+					            while ((len = zis.read(buffer)) > 0) {
+					            	fos.write(buffer, 0, len);
+					            }
+					            fos.close();					            
+				            }else {
+				            	System.out.println("lang.ini skipped!");
+				            }
+		            	}else {
+		            		System.out.println(TwoTakeOneTool.languageFolderMod + File.separator + "lang.ini can be copied");
+		            		int awnser = JOptionPane.showConfirmDialog(null, "Pack includes a language file, do you want to copy that?","Warning",JOptionPane.YES_NO_OPTION);				            
+				            if(awnser == JOptionPane.YES_OPTION) {
+				            	FileOutputStream fos = new FileOutputStream(lang);
+					            int len;
+					            while ((len = zis.read(buffer)) > 0) {
+					            	fos.write(buffer, 0, len);
+					            }
+					            fos.close();					            
+				            }
+		            	}
+		            	
+		            }else if(zipEntry.getName().endsWith(".ini")){
+		            	String profileName = TwoTakeOneTool.uiFolderMod + File.separator + PackHelper.createOldFileName(this.listString.getOrDefault("Name", "Error")).replace(".zip", "").replace(".rar", "") + ".ini";
+		            	File profile = new File(profileName);		            	
+		            	FileOutputStream fos = new FileOutputStream(profile);
+			            int len;
+			            while ((len = zis.read(buffer)) > 0) {
+			            	fos.write(buffer, 0, len);
+			            }
+			            fos.close();
+			            ArrayList<String> file = new ArrayList<String>();			            
+			            BufferedReader reader = new BufferedReader(new FileReader(profile));
+			            String readed = reader.readLine();
+			            while(readed != null) {			            	
+			            	file.add(readed);			            	
+			            	readed = reader.readLine();
+			            }
+			            reader.close();
+			            BufferedWriter writer = new BufferedWriter(new FileWriter(profile));			            
+			            for(String s : file) {
+			            	if(s.contains("header_lbl=")) {
+			            		writer.write("header_lbl=" + PackHelper.createOldFileName(this.listString.getOrDefault("Name", "Error")).replace(".zip", "").replace(".rar", ""));
+			            	}else {
+			            		writer.write(s);
+			            	}
+			            	writer.newLine();
+			            }		
+			            writer.flush();
+			            writer.close();
+		            }else {
+		            	//System.out.println("cant process filetyp: " + zipEntry.getName());
+		            }	
+		            	
+		        }	
+		        zipEntry = zis.getNextEntry();
+		    }
+		    zis.close();	
+		}catch(IOException ex) {
+			ex.printStackTrace();
+		}			
 	}
 	
 	public void deinstall(TwoTakeOnePackView pack) throws IOException {
