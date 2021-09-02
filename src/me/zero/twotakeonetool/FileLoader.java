@@ -302,13 +302,18 @@ public class FileLoader {
 		try {
 			pack.close();
 			TwoTakeOneToolGui.instance.gui.pane.removePack(name);
+			File target = new File(TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName().replace(" ", "_").replace(".2take1pack", "") + ".2take1pack");
+			File source = new File(pack.config.getPath());
+			System.out.println("copy " + source + "(" + source.exists() + ")" + " to " + target + "(" + target.exists() + ")");
 			
-			System.out.println(pack.getType());
-			Files.move(
-					new File(pack.config.getPath()).toPath(),
-					new File(TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName() + ".2take1pack").toPath(),
-					StandardCopyOption.REPLACE_EXISTING);
-			return TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName() + ".2take1pack";
+			if(!target.exists()) {
+				Files.move(
+						source.toPath(),
+						target.toPath(),
+						StandardCopyOption.REPLACE_EXISTING);
+			}			
+			//return TwoTakeOneTool.getPackFolderBySelectedEntry(pack.getType()).getAbsolutePath() + "\\" + pack.getName().replace(" ", "_").replace(".2take1pack", "") + ".2take1pack";
+			return target.getPath();
 		}catch(IOException e) {
 			e.printStackTrace();
 		}		
@@ -479,29 +484,34 @@ public class FileLoader {
 					URLConnection urlConnection = url.openConnection();
 					FileConfiguration config = new FileConfiguration(new Yaml(), urlConnection.getInputStream(), webPackFile);
 					Object o = config.getSettings().get("packs");
-					if(o.getClass().equals(ArrayList.class)) {
-						ArrayList<String> wpacks = (ArrayList<String>)o;
-						for(String webpackUrl  : wpacks) {
-							if(loadWebPack.isInterrupted()) {
-								return;
-							}else {
-								if(TwoTakeOneToolGui.instance.gui.getToolBar().getSelectedEntryType().equals(type)) {
-									FileConfiguration webPackconfig = loadWebPack(type, webpackUrl);
-									if(webPackconfig != null) {
-										TwoTakeOnePackView pack = new TwoTakeOnePackView(webPackconfig, TwoTakeOneToolGui.instance.gui.getSideBar(), type);
-										pack.setWebPack(true);
-										TwoTakeOneToolGui.instance.gui.pane.addTwoTakeOnePackView(pack);
-										TwoTakeOneToolGui.instance.gui.repaint();
-									}
+					if(o != null) {
+						if(o.getClass().equals(ArrayList.class)) {
+							ArrayList<String> wpacks = (ArrayList<String>)o;
+							for(String webpackUrl  : wpacks) {
+								if(loadWebPack.isInterrupted()) {
+									return;
 								}else {
-									loadWebPack.interrupt();
+									if(TwoTakeOneToolGui.instance.gui.getToolBar().getSelectedEntryType().equals(type)) {
+										FileConfiguration webPackconfig = loadWebPack(type, webpackUrl);
+										if(webPackconfig != null) {
+											TwoTakeOnePackView pack = new TwoTakeOnePackView(webPackconfig, TwoTakeOneToolGui.instance.gui.getSideBar(), type);
+											pack.setWebPack(true);
+											TwoTakeOneToolGui.instance.gui.pane.addTwoTakeOnePackView(pack);
+											TwoTakeOneToolGui.instance.gui.repaint();
+										}
+									}else {
+										loadWebPack.interrupt();
+									}
 								}
 							}
+							TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+						}else {
+							System.out.println("unknown type " + o.getClass());
 						}
-						TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-					}else {
-						System.out.println("unknown type " + o.getClass());
+					}else{
+						System.out.println("corrupted webpack " + webPackFile);
 					}
+					
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}catch (IOException e) {
@@ -515,6 +525,7 @@ public class FileLoader {
 		if(webpackUrl.contains("packList.yml")) {
 			return null;
 		}
+		webpackUrl = webpackUrl.replace(" ", "%20");
 		TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		String[] splittedString = webpackUrl.split("/");
 		String name = splittedString[splittedString.length-1].split(".2take1pack")[0] + ".2take1pack";
@@ -546,6 +557,7 @@ public class FileLoader {
 			    }
 			}
 		} catch (IOException e) {
+			
 			JOptionPane.showMessageDialog(null, "Error downloading '" + webpackUrl + "'");
 			System.out.println("Error downloading webpack '" + webpackUrl + "'");
 		}

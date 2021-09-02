@@ -61,7 +61,7 @@ public class TwoTakeOneTool {
 	public static File outfitFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\moddedOutfits\\");
 	public static File vehicleFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\moddedVehicles\\");
 	public static File languageFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\");
-	public static File fontFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\ui\\fonts\\");
+	public static File fontFolderMod = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\ui\\fonts\\");
 	public static File profileModFolder = new File(System.getenv("APPDATA") + "\\PopstarDevs\\2Take1Menu\\profiles\\");
 
 	public static TwoTakeOneToolGui gui;
@@ -85,7 +85,12 @@ public class TwoTakeOneTool {
 		try {
 			for(HashMap<String, String> installedPack : dataList) {
 				String Packpath = installedPack.get("Path");
-
+				if(Packpath == null) {
+					System.out.println("error checking " + installedPack.get("Name"));
+					for(String key : installedPack.keySet()) {
+						System.out.println(key + ": " + installedPack.get(key));
+					}
+				}
 				File packFile = new File(Packpath);
 				if(packFile.exists()) {
 					TwoTakeOnePackView pack = new TwoTakeOnePackView(FileLoader.loadModFile(packFile, SideBarEntryType.LOAD), TwoTakeOneToolGui.instance.gui.getSideBar(), SideBarEntryType.LOAD);
@@ -136,7 +141,7 @@ public class TwoTakeOneTool {
 					pack = null;
 					TwoTakeOneToolGui.instance.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				}else {
-					JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_MISSING_PACKFILE).replace("<Packpath>", Packpath),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, Language.getTranslatedString(LanguageKey.ERROR_MISSING_PACKFILE).replace("<Packpath>", Packpath).replace("<packpath>", Packpath),Language.getTranslatedString(LanguageKey.ERROR),JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}catch(ClassCastException ex) {

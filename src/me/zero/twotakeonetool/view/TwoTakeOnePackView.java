@@ -277,17 +277,19 @@ public class TwoTakeOnePackView extends JComponent{
 		
 		g2.setColor(new Color(red,green,blue));
 		//g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 400);
-		
-		g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 400);
+		//Content Box		
 
 		//g2.setColor(new Color(41,44,56));
-		g2.setColor(new Color(26,27,33));
 		//System.out.println("drawing: " + this.getType().name());
+		//Content Box
 		if(this.getType().equals(SideBarEntryType.UI)) {
 			g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 703);
 		}else {
-			g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 40);
-		}		
+			g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 400);
+		}	
+		//Farbe Pack Header
+		g2.setColor(new Color(26,27,33));
+		g2.fillRect(x, y, (TwoTakeOneToolGui.instance.getWidth()-bar.getWidth()-20), 40);
 
 		g2.setColor(new Color(126,86,194));
 		g2.setFont(new Font("Open Sans, Lucida Sans", Font.PLAIN, 30));
@@ -323,7 +325,10 @@ public class TwoTakeOnePackView extends JComponent{
 		
 		//Beschreibung
 		g2.setFont(new Font("Arial",Font.PLAIN,20));
-		desc.get(page).paint(g2);
+		if(desc.size() > page) {
+			desc.get(page).paint(g2);	
+		}
+		
 		if(desc.size() > 1 && (page+1) < desc.size()) {
 			this.forward.paint(g2, bar.getWidth()+35, y+380);
 			g2.setColor(new Color(41,44,56));
@@ -341,16 +346,19 @@ public class TwoTakeOnePackView extends JComponent{
 			this.backward.paint(g2, -200, -200);
 		}
 		if(install.getType().equals(SideBarEntryType.INSTALL)) {
-			g2.setColor(new Color(41,44,56));
-			g2.drawRect(TwoTakeOneToolGui.instance.getWidth()-305, y+355, install.getWidth(), install.getHeight() + 10);
 			g2.setColor(new Color(126,86,194));
-			install.paint(g2, TwoTakeOneToolGui.instance.getWidth()-300, y+380);
+			g2.drawRect(TwoTakeOneTool.gui.gui.getSideBar().getWidth()+4, y+355, install.getWidth(), install.getHeight() + 10);
+			g2.setColor(new Color(126,86,194));
+			//install.paint(g2, TwoTakeOneToolGui.instance.getWidth()-300, y+380);
+			install.paint(g2, TwoTakeOneTool.gui.gui.getSideBar().getWidth()+5, y+380);
 		}else {
-			g2.setColor(new Color(41,44,56));
-			g2.drawRect(TwoTakeOneToolGui.instance.getWidth()-320, y+355, install.getWidth(), install.getHeight() + 10);
 			g2.setColor(new Color(126,86,194));
-			install.paint(g2, TwoTakeOneToolGui.instance.getWidth()-320, y+380);
+			g2.drawRect(TwoTakeOneTool.gui.gui.getSideBar().getWidth()+4, y+355, install.getWidth(), install.getHeight() + 10);
+			g2.setColor(new Color(126,86,194));
+			//install.paint(g2, TwoTakeOneToolGui.instance.getWidth()-320, y+380);
+			install.paint(g2, TwoTakeOneTool.gui.gui.getSideBar().getWidth()+5, y+380);
 		}
+		
 		delete.paint(g2, TwoTakeOneToolGui.instance.getWidth()-55, y+20);
 		g2.setColor(new Color(41,44,56));
 
@@ -367,10 +375,13 @@ public class TwoTakeOnePackView extends JComponent{
 		g2.setColor(Color.white);
 		if(author != null) {
 			g2.drawString("Author:", bar.getWidth()+5, y+170);
-			g2.drawString(author, bar.getWidth()+5, y+195);
-		}	
-		
-		
+			if(author.length() > 16) {
+				g2.drawString(author.substring(0,16), bar.getWidth()+5, y+195);
+				g2.drawString(author.substring(16), bar.getWidth()+5, y+210);
+			}else {
+				g2.drawString(author, bar.getWidth()+5, y+195);
+			}			
+		}
 	}
 	@Override
 	public int getX() {
@@ -400,6 +411,7 @@ public class TwoTakeOnePackView extends JComponent{
 
 	public void install() {
 		try {
+			System.out.println(TwoTakeOneTool.getInstallFolderBySelectedEntry(this) + " for " + this.getType().name());
 			config.install(TwoTakeOneTool.getInstallFolderBySelectedEntry(this));
 			status = InstallStatus.INSTALLED;
 			install.setText(Language.getTranslatedString(LanguageKey.DEINSTALL));
@@ -449,10 +461,12 @@ public class TwoTakeOnePackView extends JComponent{
 			install.setFunction(new Consumer<JSideBarEntry>() {
 				@Override
 				public void accept(JSideBarEntry t) {
+					String path;
 					if(isWebPack) {
-						FileLoader.installWebPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+						path = FileLoader.installWebPack(t.getPack().getName() + ":" + t.getPack().getVersion());
 					}else {
 						FileLoader.installPack(t.getPack().getName() + ":" + t.getPack().getVersion());
+						path = t.getPack().config.getPath();
 					}
 					HashMap<String, Object> data = FileLoader.loadDataStorage().getSettings();
 					@SuppressWarnings("unchecked")
@@ -461,7 +475,8 @@ public class TwoTakeOnePackView extends JComponent{
 					HashMap<String, String> hashmapdata = new HashMap<String, String>();
 					hashmapdata.put("Name", t.getPack().getName());
 					hashmapdata.put("Version", t.getPack().getVersion());
-					hashmapdata.put("Path", t.getPack().config.getPath());
+					hashmapdata.put("Path", path);
+					System.out.println("path: " + path);
 					dataList.add(hashmapdata);
 					FileLoader.loadDataStorage().storeData("installedPack", dataList);
 				}

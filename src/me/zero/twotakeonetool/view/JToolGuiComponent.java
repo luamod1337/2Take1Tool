@@ -48,7 +48,7 @@ public class JToolGuiComponent extends JComponent{
 			public void accept(JSideBarEntry t) {
 				bar.setSelectedEntry(t);
 			}
-		}, SideBarEntryType.UI));
+		}, SideBarEntryType.SPRITE));
 		bar.addEntry(new JSideBarEntry(Language.getTranslatedString(LanguageKey.TYP_UI),ImageIO.read(getClass().getResource("/ressources/images/image.png")), bar, new Consumer<JSideBarEntry>() {
 			@Override
 			public void accept(JSideBarEntry t) {
